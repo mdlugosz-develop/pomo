@@ -3,7 +3,7 @@
 import { useState, KeyboardEvent } from 'react'
 import { useWorkspace } from '@/contexts/workspace-context'
 import { cn } from '@/lib/utils'
-import { Plus, Check } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { Input } from './ui/input'
 
 export function TaskPanel() {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,10 +9,12 @@ import { useAuth } from "@/contexts/auth-context"
 
 export function SignInDialog({
   isOpen,
-  onClose
+  onClose,
+  onSignUpClick
 }: {
   isOpen: boolean
   onClose: () => void
+  onSignUpClick: () => void
 }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -37,6 +39,15 @@ export function SignInDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Sign In</DialogTitle>
+          <DialogDescription>
+            Don't have an account?{' '}
+            <button
+              onClick={onSignUpClick}
+              className="text-primary hover:underline font-medium"
+            >
+              Sign up
+            </button>
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

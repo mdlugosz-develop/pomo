@@ -30,4 +30,12 @@ export interface WorkspaceContextType {
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
   deleteWorkspace: (workspaceId: string) => Promise<void>
+}
+
+export interface CreateTaskInput {
+  title: string
+  description?: string
+  status?: 'todo' | 'in_progress' | 'completed'
+  priority?: 'low' | 'medium' | 'high'
+  due_date?: string
 } 

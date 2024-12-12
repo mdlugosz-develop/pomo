@@ -1,6 +1,5 @@
 'use client'
 
-import { Workspace } from '@/lib/types'
 import { useWorkspace } from '@/contexts/workspace-context'
 import { useAuth } from '@/contexts/auth-context'
 import { cn } from '@/lib/utils'

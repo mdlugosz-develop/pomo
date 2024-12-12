@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
 import { LogIn, LogOut } from "lucide-react"
 import { SignInDialog } from "./sign-in-dialog"
+import { SignUpDialog } from "./sign-up-dialog"
 
 export function AuthButton() {
   const { user, signOut } = useAuth()
   const [showSignInDialog, setShowSignInDialog] = useState(false)
+  const [showSignUpDialog, setShowSignUpDialog] = useState(false)
 
   const handleSignOut = async () => {
     try {
@@ -16,6 +18,16 @@ export function AuthButton() {
     } catch (error) {
       console.error('Error signing out:', error)
     }
+  }
+
+  const handleSignUpClick = () => {
+    setShowSignInDialog(false)
+    setShowSignUpDialog(true)
+  }
+
+  const handleSignInClick = () => {
+    setShowSignUpDialog(false)
+    setShowSignInDialog(true)
   }
 
   return (
@@ -40,7 +52,14 @@ export function AuthButton() {
 
       <SignInDialog 
         isOpen={showSignInDialog} 
-        onClose={() => setShowSignInDialog(false)} 
+        onClose={() => setShowSignInDialog(false)}
+        onSignUpClick={handleSignUpClick}
+      />
+
+      <SignUpDialog
+        isOpen={showSignUpDialog}
+        onClose={() => setShowSignUpDialog(false)}
+        onSignInClick={handleSignInClick}
       />
     </>
   )
