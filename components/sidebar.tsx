@@ -1,12 +1,11 @@
 'use client'
 
-import { Home, ListTodo, LogIn, Plus } from 'lucide-react'
+import { Home, ListTodo } from 'lucide-react'
 import Link from "next/link"
 import { AuthButton } from "@/components/auth-button"
-import { useWorkspace } from '@/contexts/workspace-context'
+import { Workspaces } from '@/components/workspaces'
 
 export function Sidebar() {
-const { workspaces } = useWorkspace()
   return (
     <div className="w-[240px] border-r p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-6">
@@ -31,21 +30,7 @@ const { workspaces } = useWorkspace()
         </Link>
       </nav>
 
-      <div className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium">Workspaces</h2>
-          <button className="p-1 hover:bg-gray-100 rounded">
-            <Plus className="w-4 h-4" />
-          </button>
-        </div>
-        <p className="text-sm text-gray-500 text-center py-4">
-            {workspaces.map((workspace) => (
-                <div key={workspace.id}>
-                    {workspace.name}
-                </div>
-            ))}
-        </p>
-      </div>
+      <Workspaces />
 
       <div className="mt-auto pb-4">
         <AuthButton />
