@@ -104,7 +104,7 @@ export function SignUpDialog({
         ) : (
           <div className="space-y-4">
             <p className="text-center text-muted-foreground">
-              We've sent a confirmation email to <span className="font-medium">{email}</span>.
+              We&apos;ve sent a confirmation email to <span className="font-medium">{email}</span>.
               Please click the link in the email to activate your account.
             </p>
             <Button onClick={onClose} className="w-full">

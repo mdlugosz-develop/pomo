@@ -40,7 +40,7 @@ export function SignInDialog({
         <DialogHeader>
           <DialogTitle>Sign In</DialogTitle>
           <DialogDescription>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <button
               onClick={onSignUpClick}
               className="text-primary hover:underline font-medium"
