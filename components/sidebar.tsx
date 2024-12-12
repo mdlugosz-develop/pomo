@@ -1,7 +1,12 @@
+'use client'
+
 import { Home, ListTodo, LogIn, Plus } from 'lucide-react'
 import Link from "next/link"
+import { AuthButton } from "@/components/auth-button"
+import { useWorkspace } from '@/contexts/workspace-context'
 
 export function Sidebar() {
+const { workspaces } = useWorkspace()
   return (
     <div className="w-[240px] border-r p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-6">
@@ -34,15 +39,16 @@ export function Sidebar() {
           </button>
         </div>
         <p className="text-sm text-gray-500 text-center py-4">
-          No workspaces yet. Create one to get started!
+            {workspaces.map((workspace) => (
+                <div key={workspace.id}>
+                    {workspace.name}
+                </div>
+            ))}
         </p>
       </div>
 
-      <div className="mt-auto">
-        <button className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-md w-full">
-          <LogIn className="w-4 h-4" />
-          Login
-        </button>
+      <div className="mt-auto pb-4">
+        <AuthButton />
       </div>
     </div>
   )
