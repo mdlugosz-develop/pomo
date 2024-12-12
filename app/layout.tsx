@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from '@/contexts/auth-context'
+import { WorkspaceProvider } from '@/contexts/workspace-context'
+import { Sidebar } from '@/components/sidebar'
+import { TaskPanel } from '@/components/task-panel'
 
 
 export const metadata: Metadata = {
@@ -9,14 +13,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
-        {children}
+        <AuthProvider>
+          <WorkspaceProvider>
+          <div className="flex h-screen bg-white">
+              <Sidebar />
+              <main className="flex-1 p-6">
+                {children}
+              </main>
+              <TaskPanel />
+            </div>
+          </WorkspaceProvider>
+        </AuthProvider>
       </body>
     </html>
-  );
+  )
 }

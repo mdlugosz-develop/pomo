@@ -1,9 +1,17 @@
-import Image from "next/image";
+'use client'
+
+import { TimerDisplay } from '@/components/timer-display'
+import { useAuth } from '@/contexts/auth-context'
+import { useWorkspace } from '@/contexts/workspace-context'
 
 export default function Home() {
+  const { user } = useAuth()
+  const { currentWorkspace, loading } = useWorkspace()
+
+  
   return (
     <div>
-      <h1>This will be shipped by december 31</h1>
+      <TimerDisplay />
     </div>
-  );
+  )
 }
