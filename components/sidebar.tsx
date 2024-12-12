@@ -4,10 +4,14 @@ import { Home, ListTodo } from 'lucide-react'
 import Link from "next/link"
 import { AuthButton } from "@/components/auth-button"
 import { Workspaces } from '@/components/workspaces'
+import { UserProfile } from './user-profile'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Sidebar() {
+  const { user } = useAuth()
+
   return (
-    <div className="w-[240px] border-r p-4 flex flex-col h-full">
+    <div className="w-[300px] border-r p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-6">
         <div className="w-5 h-5 rounded-full border-2 border-black" />
         <h1 className="font-medium">PomoTime</h1>
@@ -33,7 +37,8 @@ export function Sidebar() {
       <Workspaces />
 
       <div className="mt-auto pb-4">
-        <AuthButton />
+        {!user && <AuthButton />}
+        {user && <UserProfile />}
       </div>
     </div>
   )
