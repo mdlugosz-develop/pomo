@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/auth-context'
 import { WorkspaceProvider } from '@/contexts/workspace-context'
 import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
+import { GlobalLoader } from '@/components/global-loader'
 
 
 export const metadata: Metadata = {
@@ -21,13 +22,15 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <WorkspaceProvider>
-          <div className="flex h-screen bg-white">
-              <Sidebar />
-              <main className="flex-1 p-6">
-                {children}
-              </main>
-              <TaskPanel />
-            </div>
+            <GlobalLoader>
+              <div className="flex h-screen bg-white">
+                <Sidebar />
+                <main className="flex-1 p-6">
+                  {children}
+                </main>
+                <TaskPanel />
+              </div>
+            </GlobalLoader>
           </WorkspaceProvider>
         </AuthProvider>
       </body>

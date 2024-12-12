@@ -16,6 +16,7 @@ interface WorkspaceContextType {
   createTask: (input: CreateTaskInput) => Promise<void>
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
+  deleteWorkspace: (workspaceId: string) => Promise<void>
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined)
@@ -98,7 +99,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   // Create a new workspace
   const createWorkspace = async (name: string, description?: string) => {
-    if (!user) throw new Error('User must be logged in')
+    if (!user) {
+      setError('You must be signed in to create a workspace')
+      throw new Error('You must be signed in to create a workspace')
+    }
 
     try {
       const { data, error } = await supabase
@@ -131,7 +135,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     priority = 'medium',
     due_date 
   }: CreateTaskInput) => {
-    if (!user) throw new Error('User must be logged in')
+    if (!user) {
+      setError('You must be signed in to create a task')
+      throw new Error('You must be signed in to create a task')
+    }
     if (!currentWorkspace) throw new Error('No workspace selected')
 
     try {
@@ -195,6 +202,28 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const deleteWorkspace = async (workspaceId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('workspaces')
+        .delete()
+        .eq('id', workspaceId)
+        .eq('user_id', user.id)
+
+      if (error) throw error
+
+      setWorkspaces(workspaces.filter(w => w.id !== workspaceId))
+      if (currentWorkspace?.id === workspaceId) {
+        setCurrentWorkspace(workspaces.find(w => w.id !== workspaceId) || null)
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'An error occurred')
+      throw e
+    }
+  }
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -208,6 +237,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         createTask,
         updateTask,
         deleteTask,
+        deleteWorkspace,
       }}
     >
       {children}
