@@ -3,6 +3,9 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import Cookies from 'js-cookie'
+
+const ACCESS_TOKEN_KEY = 'access_token'
 
 interface AuthContextType {
   user: User | null
@@ -22,12 +25,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user || null)
+      // Set access token if session exists
+      if (data.session?.access_token) {
+        Cookies.set(ACCESS_TOKEN_KEY, data.session.access_token)
+      }
       setLoading(false)
     })
 
     // Listen for changes on auth state (signed in, signed out, etc.)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null)
+      // Update access token on auth state change
+      if (session?.access_token) {
+        Cookies.set(ACCESS_TOKEN_KEY, session.access_token)
+      } else {
+        Cookies.remove(ACCESS_TOKEN_KEY)
+      }
       setLoading(false)
     })
 
@@ -37,18 +50,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    
     if (error) throw error
+    
+    // Set access token after successful sign in
+    if (data.session?.access_token) {
+      Cookies.set(ACCESS_TOKEN_KEY, data.session.access_token)
+    }
   }
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) throw error
+    
+    // Set access token after successful sign up (if session is available immediately)
+    if (data.session?.access_token) {
+      Cookies.set(ACCESS_TOKEN_KEY, data.session.access_token)
+    }
   }
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
+    
+    // Remove access token after sign out
+    Cookies.remove(ACCESS_TOKEN_KEY)
   }
 
   return (
