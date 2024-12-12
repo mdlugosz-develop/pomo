@@ -13,12 +13,20 @@ interface WorkspaceContextType {
   error: string | null
   setCurrentWorkspace: (workspace: Workspace) => void
   createWorkspace: (name: string, description?: string) => Promise<void>
-  createTask: (title: string, description?: string) => Promise<void>
+  createTask: (input: CreateTaskInput) => Promise<void>
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined)
+
+interface CreateTaskInput {
+  title: string
+  description?: string
+  status?: 'todo' | 'in_progress' | 'completed'
+  priority?: 'low' | 'medium' | 'high'
+  due_date?: string
+}
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
@@ -116,7 +124,13 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Create a new task
-  const createTask = async (title: string, description?: string) => {
+  const createTask = async ({ 
+    title, 
+    description, 
+    status = 'todo', 
+    priority = 'medium',
+    due_date 
+  }: CreateTaskInput) => {
     if (!user) throw new Error('User must be logged in')
     if (!currentWorkspace) throw new Error('No workspace selected')
 
@@ -127,9 +141,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           {
             title,
             description,
-            completed: false,
+            status,
+            priority,
+            due_date,
             workspace_id: currentWorkspace.id,
-            user_id: user.id,
           },
         ])
         .select()

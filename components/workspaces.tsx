@@ -3,7 +3,7 @@
 import { Workspace } from '@/lib/types'
 import { useWorkspace } from '@/contexts/workspace-context'
 import { cn } from '@/lib/utils'
-import { Plus } from 'lucide-react'
+import { CreateWorkspaceDialog } from './create-workspace-dialog'
 
 export function Workspaces() {
   const { workspaces, currentWorkspace, setCurrentWorkspace } = useWorkspace()
@@ -12,9 +12,7 @@ export function Workspaces() {
     <div className="mt-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-medium">Workspaces</h2>
-        <button className="p-1 hover:bg-gray-100 rounded">
-          <Plus className="w-4 h-4" />
-        </button>
+        <CreateWorkspaceDialog />
       </div>
       <div className="space-y-1">
         {workspaces.map((workspace) => (
