@@ -23,6 +23,7 @@ export function useTimer() {
   const [isRunning, setIsRunning] = useState(false)
   const [sessionCount, setSessionCount] = useState(0)
 
+
   const resetTimer = useCallback((newMode?: TimerMode) => {
     const timerMode = newMode || mode
     setTimeLeft(settings[timerMode])

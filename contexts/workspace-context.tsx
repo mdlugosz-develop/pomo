@@ -5,6 +5,9 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
 import { Task, Workspace } from '../lib/types'
 
+// Add a key for localStorage
+const LOCAL_TASKS_KEY = 'local_tasks'
+
 interface WorkspaceContextType {
   workspaces: Workspace[]
   currentWorkspace: Workspace | null
@@ -36,6 +39,23 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Load local tasks on initial mount
+  useEffect(() => {
+    if (!user) {
+      const localTasks = localStorage.getItem(LOCAL_TASKS_KEY)
+      if (localTasks) {
+        setTasks(JSON.parse(localTasks))
+      }
+    }
+  }, [])
+
+  // Save tasks to localStorage whenever they change and user is not signed in
+  useEffect(() => {
+    if (!user) {
+      localStorage.setItem(LOCAL_TASKS_KEY, JSON.stringify(tasks))
+    }
+  }, [tasks, user])
 
   // Fetch workspaces when user changes
   useEffect(() => {
@@ -71,9 +91,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     fetchWorkspaces()
   }, [user])
 
-  // Fetch tasks when currentWorkspace changes
+  // Modified tasks fetch effect
   useEffect(() => {
-    if (!currentWorkspace || !user) {
+    if (!user) {
+      // Don't fetch from database if user is not signed in
+      return
+    }
+
+    if (!currentWorkspace) {
       setTasks([])
       return
     }
@@ -87,7 +112,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           .order('created_at', { ascending: false })
 
         if (error) throw error
-
         setTasks(data)
       } catch (e) {
         setError(e instanceof Error ? e.message : 'An error occurred')
@@ -127,7 +151,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Create a new task
+  // Modified createTask function
   const createTask = async ({ 
     title, 
     description, 
@@ -136,9 +160,23 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     due_date 
   }: CreateTaskInput) => {
     if (!user) {
-      setError('You must be signed in to create a task')
-      throw new Error('You must be signed in to create a task')
+      // Create local task when user is not signed in
+      const newTask: Task = {
+        id: crypto.randomUUID(), // Generate a local ID
+        title,
+        description,
+        status,
+        priority,
+        due_date,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        workspace_id: '', // No workspace for local tasks
+      }
+      setTasks([newTask, ...tasks])
+      return
     }
+
+    // Existing database task creation logic...
     if (!currentWorkspace) throw new Error('No workspace selected')
 
     try {
@@ -158,7 +196,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (error) throw error
-
       setTasks([data, ...tasks])
     } catch (e) {
       setError(e instanceof Error ? e.message : 'An error occurred')
@@ -166,8 +203,17 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Update a task
+  // Modified updateTask function
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    if (!user) {
+      // Update local task
+      setTasks(tasks.map(task => 
+        task.id === taskId ? { ...task, ...updates } : task
+      ))
+      return
+    }
+
+    // Existing database update logic...
     try {
       const { error } = await supabase
         .from('tasks')
@@ -185,8 +231,15 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Delete a task
+  // Modified deleteTask function
   const deleteTask = async (taskId: string) => {
+    if (!user) {
+      // Delete local task
+      setTasks(tasks.filter(task => task.id !== taskId))
+      return
+    }
+
+    // Existing database delete logic...
     try {
       const { error } = await supabase
         .from('tasks')
