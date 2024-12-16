@@ -21,13 +21,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+
   useEffect(() => {
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user || null)
       // Set access token if session exists
       if (data.session?.access_token) {
-        Cookies.set(ACCESS_TOKEN_KEY, data.session.access_token)
+        Cookies.set(ACCESS_TOKEN_KEY, data.session.access_token)  
       }
       setLoading(false)
     })
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.access_token) {
         Cookies.set(ACCESS_TOKEN_KEY, session.access_token)
       } else {
-        Cookies.remove(ACCESS_TOKEN_KEY)
+        Cookies.delete(ACCESS_TOKEN_KEY)
       }
       setLoading(false)
     })
@@ -75,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error
     
     // Remove access token after sign out
-    Cookies.remove(ACCESS_TOKEN_KEY)
+    Cookies.delete(ACCESS_TOKEN_KEY)
   }
 
   return (
