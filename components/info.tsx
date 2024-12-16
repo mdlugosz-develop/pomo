@@ -10,7 +10,6 @@ export function Info() {
             <h1>Info</h1>
             <p>{currentWorkspace?.name}</p>
             <p>{tasks.length}</p>   
-            <p>{user?.access_token || 'No user'}</p>
         </div>
     )
 }
