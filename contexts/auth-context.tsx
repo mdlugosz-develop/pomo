@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.access_token) {
         Cookies.set(ACCESS_TOKEN_KEY, session.access_token)
       } else {
-        Cookies.delete(ACCESS_TOKEN_KEY)
+        Cookies.remove(ACCESS_TOKEN_KEY)
       }
       setLoading(false)
     })
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error
     
     // Remove access token after sign out
-    Cookies.delete(ACCESS_TOKEN_KEY)
+    Cookies.remove(ACCESS_TOKEN_KEY)
   }
 
   return (
