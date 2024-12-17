@@ -6,6 +6,7 @@ import { AuthButton } from "@/components/auth-button"
 import { Workspaces } from '@/components/workspaces'
 import { UserProfile } from './user-profile'
 import { useAuth } from '@/contexts/auth-context'
+import { Clock } from 'lucide-react'
 
 export function Sidebar() {
   const { user } = useAuth()
@@ -13,7 +14,7 @@ export function Sidebar() {
   return (
     <div className="w-[300px] border-r p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-6">
-        <div className="w-5 h-5 rounded-full border-2 border-black" />
+        <Clock />
         <h1 className="font-medium">PomoTime</h1>
       </div>
       

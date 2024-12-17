@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only allow access to the root path '/'
-  if (pathname !== '/') {
+  if (pathname == '/no') {
     // Redirect to the root path
     return NextResponse.redirect(new URL('/', request.url));
   }
