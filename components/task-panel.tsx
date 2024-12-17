@@ -19,7 +19,6 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { arrayMove } from '@dnd-kit/sortable'
 
 export function TaskPanel() {
   const { user } = useAuth()
