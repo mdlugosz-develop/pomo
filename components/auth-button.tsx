@@ -25,10 +25,11 @@ export function AuthButton() {
     setShowComingSoonDialog(true)
   }
 
-  const handleSignInClick = () => {
+/*   const handleSignInClick = () => {
     setShowComingSoonDialog(false)
     setShowSignInDialog(true)
   }
+ */
 
   return (
     <>
