@@ -5,10 +5,10 @@ export interface Task {
   status: 'todo' | 'in_progress' | 'completed'
   priority: 'low' | 'medium' | 'high'
   due_date?: string
-  workspace_id: string
   created_at: string
   updated_at: string
   order?: number
+  workspace_id: string
 }
 
 export interface Workspace {

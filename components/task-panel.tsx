@@ -117,6 +117,10 @@ export function TaskPanel() {
     })
   }
 
+  const handlePriorityChange = async (taskId: string, priority: 'low' | 'medium' | 'high') => {
+    await updateTask(taskId, { priority })
+  }
+
   const TaskList = () => (
     <div className="space-y-4">
       {/* Active Tasks */}
@@ -136,6 +140,7 @@ export function TaskPanel() {
                 task={task}
                 onDelete={deleteTask}
                 onStatusToggle={toggleTaskStatus}
+                onPriorityChange={handlePriorityChange}
               />
             ))}
           </div>
@@ -161,6 +166,7 @@ export function TaskPanel() {
                   task={task}
                   onDelete={deleteTask}
                   onStatusToggle={toggleTaskStatus}
+                  onPriorityChange={handlePriorityChange}
                 />
               ))}
             </div>

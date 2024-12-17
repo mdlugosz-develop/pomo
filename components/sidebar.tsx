@@ -20,7 +20,7 @@ export function Sidebar() {
       
       <nav className="space-y-2">
         <Link
-          href="#"
+          href="/"
           className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-md"
         >
           <Home className="w-4 h-4" />

@@ -170,6 +170,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         status,
         priority,
         due_date,
+        order: (Math.max(0, ...tasks.map(t => t.order ?? 0)) + 1000), // Add order for local tasks
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         workspace_id: '', // No workspace for local tasks
@@ -178,10 +179,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // Existing database task creation logic...
+    // Database task creation logic with order
     if (!currentWorkspace) throw new Error('No workspace selected')
 
     try {
+      // Calculate the highest current order value
+      const maxOrder = Math.max(0, ...tasks.map(t => t.order ?? 0))
+      const newOrder = maxOrder + 1000 // Add buffer for future reordering
+
       const { data, error } = await supabase
         .from('tasks')
         .insert([
@@ -191,6 +196,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
             status,
             priority,
             due_date,
+            order: newOrder,
             workspace_id: currentWorkspace.id,
           },
         ])

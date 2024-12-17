@@ -3,14 +3,21 @@ import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import { Task } from "@/lib/types"
 import { GripVertical } from "lucide-react"
+import { TaskPriority } from "./task-priority"
 
 interface TaskItemProps {
   task: Task
   onDelete: (id: string) => void
   onStatusToggle: (id: string, status: string) => void
+  onPriorityChange: (id: string, priority: 'low' | 'medium' | 'high') => void
 }
 
-export function TaskItem({ task, onDelete, onStatusToggle }: TaskItemProps) {
+export function TaskItem({ 
+  task, 
+  onDelete, 
+  onStatusToggle,
+  onPriorityChange 
+}: TaskItemProps) {
   const {
     attributes,
     listeners,
@@ -59,6 +66,10 @@ export function TaskItem({ task, onDelete, onStatusToggle }: TaskItemProps) {
             >
               {task.title}
             </h3>
+            <TaskPriority
+              priority={task.priority || 'medium'}
+              onPriorityChange={(priority) => onPriorityChange(task.id, priority)}
+            />
             {task.due_date && (
               <span className={cn(
                 "text-xs",
