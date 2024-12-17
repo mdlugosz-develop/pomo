@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export type TimerMode = "focus" | "shortBreak" | "longBreak"
 
@@ -8,6 +8,8 @@ export interface TimerSettings {
   longBreak: number
   longBreakInterval: number
 }
+
+
 
 const DEFAULT_SETTINGS: TimerSettings = {
   focus: 25 * 60, // 25 minutes in seconds
@@ -23,6 +25,24 @@ export function useTimer() {
   const [isRunning, setIsRunning] = useState(false)
   const [sessionCount, setSessionCount] = useState(0)
 
+  const bellRef = useRef<HTMLAudioElement | null>(null)
+  const clickRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    bellRef.current = new Audio('/sounds/bell.mp3')
+    clickRef.current = new Audio('/sounds/click.wav')
+
+    return () => {
+      if (bellRef.current) {
+        bellRef.current.pause()
+        bellRef.current = null
+      }
+      if (clickRef.current) {
+        clickRef.current.pause()
+        clickRef.current = null
+      }
+    }
+  }, [])
 
   const resetTimer = useCallback((newMode?: TimerMode) => {
     const timerMode = newMode || mode
@@ -31,6 +51,7 @@ export function useTimer() {
   }, [mode, settings])
 
   const switchMode = useCallback((newMode: TimerMode, autoStart: boolean = false) => {
+    bellRef.current?.play().catch(error => console.error('Error playing sound:', error))
     resetTimer(newMode)
     if (autoStart) {
       setIsRunning(true)
@@ -40,6 +61,7 @@ export function useTimer() {
   }, [resetTimer])
 
   const toggleTimer = useCallback(() => {
+    clickRef.current?.play().catch(error => console.error('Error playing sound:', error))
     setIsRunning(prev => !prev)
   }, [])
 

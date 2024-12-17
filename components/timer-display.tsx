@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useTimer, TimerMode } from '@/hooks/use-timer'
 import { TimerSettingsDialog } from '@/components/timer-settings-dialog'
+import { TimerCountdown } from '@/components/timer-countdown'
 
 export function TimerDisplay() {
   const { 
@@ -41,9 +42,7 @@ export function TimerDisplay() {
 
         {/* Timer Display */}
         <div className="flex justify-center mb-8">
-          <div className="text-4xl sm:text-7xl font-mono border-2 rounded-full px-6 sm:px-12 py-4 sm:py-8 whitespace-nowrap">
-            {formattedTime}
-          </div>
+          <TimerCountdown formattedTime={formattedTime} />
         </div>
 
         {/* Timer Controls */}
