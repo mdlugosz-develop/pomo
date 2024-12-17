@@ -5,6 +5,7 @@ import { WorkspaceProvider } from '@/contexts/workspace-context'
 import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
 import { GlobalLoader } from '@/components/global-loader'
+import { Analytics } from "@vercel/analytics/react"
 
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
         <AuthProvider>
           <WorkspaceProvider>
             <GlobalLoader>
+              <Analytics />
               <div className="flex h-screen bg-white">
                 <Sidebar />
                 <main className="flex-1 p-6">
