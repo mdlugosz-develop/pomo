@@ -9,8 +9,6 @@ export interface TimerSettings {
   longBreakInterval: number
 }
 
-
-
 const DEFAULT_SETTINGS: TimerSettings = {
   focus: 25 * 60, // 25 minutes in seconds
   shortBreak: 5 * 60, // 5 minutes in seconds

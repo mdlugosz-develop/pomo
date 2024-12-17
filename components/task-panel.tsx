@@ -2,24 +2,92 @@
 
 import { useState, KeyboardEvent } from 'react'
 import { useWorkspace } from '@/contexts/workspace-context'
-import { cn } from '@/lib/utils'
 import { Plus, ChevronDown, ChevronRight } from 'lucide-react'
 import { Input } from './ui/input'
 import { useAuth } from '@/contexts/auth-context'
-import { Task } from '@/lib/types'
+import { TaskItem } from './task-item'
+import {
+  DndContext,
+  DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 
 export function TaskPanel() {
   const { user } = useAuth()
-  const { currentWorkspace, tasks, createTask, updateTask, deleteTask } = useWorkspace()
+  const { currentWorkspace, tasks, createTask, updateTask, deleteTask, updateTaskOrder } = useWorkspace()
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [showCompleted, setShowCompleted] = useState(false)
 
-  // Separate active and completed tasks
-  const activeTasks = tasks.filter(task => task.status !== 'completed')
+  // Configure sensors for drag detection
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  )
+
+  // Update the sorting to use order first
+  const activeTasks = tasks
+    .filter(task => task.status !== 'completed')
+    .sort((a, b) => {
+      // First sort by order
+      const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+      const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+      if (orderA !== orderB) return orderA - orderB
+      // Then by creation date if orders are equal
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    })
+
+  const completedTasks = tasks
+    .filter(task => task.status === 'completed')
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-  const completedTasks = tasks.filter(task => task.status === 'completed')
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const oldIndex = activeTasks.findIndex(task => task.id === active.id)
+      const newIndex = activeTasks.findIndex(task => task.id === over.id)
+
+      // Create a new array with the updated order
+      const reorderedTasks = [...activeTasks]
+      const [movedTask] = reorderedTasks.splice(oldIndex, 1)
+      reorderedTasks.splice(newIndex, 0, movedTask)
+
+      // Calculate new orders
+      const updates = reorderedTasks.map((task, index) => ({
+        id: task.id,
+        order: index * 1000
+      }))
+
+      // Update local state immediately
+      updateTaskOrder(updates, true)
+
+      // Then sync with database
+      try {
+        await updateTaskOrder(updates, false)
+      } catch (error) {
+        console.error('Failed to update task order:', error)
+        // Optionally revert the UI if the database update fails
+        // fetchTasks() or similar recovery mechanism
+      }
+    }
+  }
 
   const handleCreateTask = async () => {
     if (!newTaskTitle.trim()) return
@@ -48,70 +116,35 @@ export function TaskPanel() {
     })
   }
 
-  const TaskItem = ({ task }: { task: Task }) => (
-    <div
-      onClick={() => toggleTaskStatus(task.id, task.status)}
-      className={cn(
-        "group p-3 rounded-md border transition-colors cursor-pointer",
-        task.status === 'completed' 
-          ? "bg-gray-50 border-gray-200 hover:border-gray-300" 
-          : "hover:border-gray-300"
-      )}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className={cn(
-              "text-sm font-medium",
-              task.status === 'completed' 
-                ? "text-gray-400 line-through" 
-                : "text-gray-700"
-            )}>
-              {task.title}
-            </h3>
-            {task.due_date && (
-              <span className={cn(
-                "text-xs",
-                task.status === 'completed' 
-                  ? "text-gray-400" 
-                  : "text-gray-500"
-              )}>
-                Due: {new Date(task.due_date).toLocaleDateString()}
-              </span>
-            )}
-          </div>
-          {task.description && (
-            <p className={cn(
-              "text-sm mt-1",
-              task.status === 'completed' 
-                ? "text-gray-400 line-through" 
-                : "text-gray-500"
-            )}>
-              {task.description}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            deleteTask(task.id)
-          }}
-          className="text-gray-400 hover:text-gray-500"
-        >
-          ×
-        </button>
-      </div>
-    </div>
-  )
+  const handlePriorityChange = async (taskId: string, priority: 'low' | 'medium' | 'high') => {
+    await updateTask(taskId, { priority })
+  }
 
   const TaskList = () => (
     <div className="space-y-4">
       {/* Active Tasks */}
-      <div className="space-y-2">
-        {activeTasks.map((task) => (
-          <TaskItem key={task.id} task={task} />
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={activeTasks.map(task => task.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-2">
+            {activeTasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onDelete={deleteTask}
+                onStatusToggle={toggleTaskStatus}
+                onPriorityChange={handlePriorityChange}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Completed Tasks Section */}
       {completedTasks.length > 0 && (
@@ -127,7 +160,13 @@ export function TaskPanel() {
           {showCompleted && (
             <div className="space-y-2 pl-2">
               {completedTasks.map((task) => (
-                <TaskItem key={task.id} task={task} />
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onDelete={deleteTask}
+                  onStatusToggle={toggleTaskStatus}
+                  onPriorityChange={handlePriorityChange}
+                />
               ))}
             </div>
           )}

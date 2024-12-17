@@ -20,6 +20,7 @@ interface WorkspaceContextType {
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
   deleteWorkspace: (workspaceId: string) => Promise<void>
+  updateTaskOrder: (updates: TaskOrderUpdate[], isOptimistic?: boolean) => Promise<void>
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined)
@@ -30,6 +31,11 @@ interface CreateTaskInput {
   status?: 'todo' | 'in_progress' | 'completed'
   priority?: 'low' | 'medium' | 'high'
   due_date?: string
+}
+
+interface TaskOrderUpdate {
+  id: string
+  order: number
 }
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
@@ -93,12 +99,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   // Modified tasks fetch effect
   useEffect(() => {
-    if (!user) {
-      // Don't fetch from database if user is not signed in
-      return
-    }
-
-    if (!currentWorkspace) {
+    if (!user || !currentWorkspace) {
       setTasks([])
       return
     }
@@ -109,6 +110,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           .from('tasks')
           .select('*')
           .eq('workspace_id', currentWorkspace?.id)
+          .order('order', { ascending: true })
           .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -168,6 +170,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         status,
         priority,
         due_date,
+        order: (Math.max(0, ...tasks.map(t => t.order ?? 0)) + 1000), // Add order for local tasks
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         workspace_id: '', // No workspace for local tasks
@@ -176,10 +179,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // Existing database task creation logic...
+    // Database task creation logic with order
     if (!currentWorkspace) throw new Error('No workspace selected')
 
     try {
+      // Calculate the highest current order value
+      const maxOrder = Math.max(0, ...tasks.map(t => t.order ?? 0))
+      const newOrder = maxOrder + 1000 // Add buffer for future reordering
+
       const { data, error } = await supabase
         .from('tasks')
         .insert([
@@ -189,6 +196,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
             status,
             priority,
             due_date,
+            order: newOrder,
             workspace_id: currentWorkspace.id,
           },
         ])
@@ -277,6 +285,50 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const updateTaskOrder = async (updates: TaskOrderUpdate[], isOptimistic = false) => {
+    // Always update local state first for immediate feedback
+    setTasks(prev => {
+      const updatedTasks = prev.map(task => {
+        const update = updates.find(u => u.id === task.id)
+        return update ? { ...task, order: update.order } : task
+      })
+      return updatedTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    })
+
+    // If this is just an optimistic update, don't sync with database
+    if (isOptimistic || !user || !currentWorkspace) return
+
+    try {
+      // Find existing tasks to preserve their data
+      const existingTasks = tasks.reduce((acc, task) => {
+        acc[task.id] = task
+        return acc
+      }, {} as Record<string, Task>)
+
+      // Batch update all tasks
+      const { error } = await supabase.from('tasks').upsert(
+        updates.map(update => ({
+          ...existingTasks[update.id], // Preserve all existing task data
+          id: update.id,
+          order: update.order,
+          workspace_id: currentWorkspace.id,
+          updated_at: new Date().toISOString()
+        })),
+        {
+          onConflict: 'id'
+        }
+      )
+
+      if (error) {
+        console.error('Error updating task order:', error)
+        throw error
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'An error occurred')
+      throw e
+    }
+  }
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -291,6 +343,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         updateTask,
         deleteTask,
         deleteWorkspace,
+        updateTaskOrder,
       }}
     >
       {children}

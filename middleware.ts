@@ -1,28 +1,49 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+// Add paths that should be accessible without authentication
+const publicPaths = [
+  '/',                    // Home page
+  '/sounds',         // Public API routes
+]
 
-  // Only allow access to the root path '/'
-  if (pathname == '/no') {
-    // Redirect to the root path
-    return NextResponse.redirect(new URL('/', request.url));
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
+  // Check if the path is public
+  const isPublicPath = publicPaths.some(path => 
+    req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`)
+  )
+
+  if (isPublicPath) {
+    return res
   }
 
-  return NextResponse.next();
+  // Check auth status
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // If no session and trying to access protected route, redirect to home
+  if (!session) {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  return res
 }
 
-// Match all paths except api routes, static files, and other Next.js internal routes
+// Configure which routes use this middleware
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
+     * Match all request paths except:
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-}; 
+} 
