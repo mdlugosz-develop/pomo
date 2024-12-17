@@ -8,6 +8,7 @@ export interface Task {
   workspace_id: string
   created_at: string
   updated_at: string
+  order?: number
 }
 
 export interface Workspace {
