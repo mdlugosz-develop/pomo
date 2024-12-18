@@ -5,7 +5,8 @@ import type { NextRequest } from 'next/server'
 // Add paths that should be accessible without authentication
 const publicPaths = [
   '/',                    // Home page
-  '/sounds',         // Public API routes
+  '/sounds',              // Public API routes
+  '/tasks',               // Tasks page
 ]
 
 export async function middleware(req: NextRequest) {

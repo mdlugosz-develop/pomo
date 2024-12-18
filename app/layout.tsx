@@ -5,6 +5,7 @@ import { WorkspaceProvider } from '@/contexts/workspace-context'
 import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
 import { GlobalLoader } from '@/components/global-loader'
+import { TimerProvider } from '@/contexts/timer-context'
 
 
 export const metadata: Metadata = {
@@ -22,15 +23,17 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <WorkspaceProvider>
-            <GlobalLoader>
-              <div className="flex h-screen bg-white">
-                <Sidebar />
-                <main className="flex-1 p-6">
-                  {children}
-                </main>
-                <TaskPanel />
-              </div>
-            </GlobalLoader>
+            <TimerProvider>
+              <GlobalLoader>
+                <div className="flex h-screen bg-white">
+                  <Sidebar />
+                  <main className="flex-1 p-6">
+                    {children}
+                  </main>
+                  <TaskPanel />
+                </div>
+              </GlobalLoader>
+            </TimerProvider>
           </WorkspaceProvider>
         </AuthProvider>
       </body>
