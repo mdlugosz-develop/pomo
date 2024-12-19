@@ -6,7 +6,8 @@ import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
 import { GlobalLoader } from '@/components/global-loader'
 import { TimerProvider } from '@/contexts/timer-context'
-
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,6 +25,8 @@ export default function RootLayout({
         <AuthProvider>
           <WorkspaceProvider>
             <TimerProvider>
+              <SpeedInsights />
+              <Analytics />
               <GlobalLoader>
                 <div className="flex h-screen bg-white">
                   <Sidebar />
