@@ -97,9 +97,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     fetchWorkspaces()
   }, [user])
 
-  // Modified tasks fetch effect
+  // Modified to fetch ALL tasks for ALL workspaces
   useEffect(() => {
-    if (!user || !currentWorkspace) {
+    if (!user || workspaces.length === 0) {
       setTasks([])
       return
     }
@@ -109,7 +109,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         const { data, error } = await supabase
           .from('tasks')
           .select('*')
-          .eq('workspace_id', currentWorkspace?.id)
+          .in('workspace_id', workspaces.map(w => w.id))
           .order('order', { ascending: true })
           .order('created_at', { ascending: false })
 
@@ -121,7 +121,42 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
 
     fetchTasks()
-  }, [currentWorkspace, user])
+  }, [user, workspaces])
+
+  // Add real-time subscription for tasks across all workspaces
+  useEffect(() => {
+    if (!user || workspaces.length === 0) return
+
+    const channel = supabase
+      .channel('tasks-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `workspace_id=in.(${workspaces.map(w => w.id).join(',')})`,
+        },
+        async (payload) => {
+          // Refresh all tasks when there's any change
+          const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .in('workspace_id', workspaces.map(w => w.id))
+            .order('order', { ascending: true })
+            .order('created_at', { ascending: false })
+
+          if (!error && data) {
+            setTasks(data)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user, workspaces])
 
   // Create a new workspace
   const createWorkspace = async (name: string, description?: string) => {

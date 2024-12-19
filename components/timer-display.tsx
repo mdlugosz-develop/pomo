@@ -3,9 +3,10 @@
 import { Brain, Coffee, Clock } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { useTimer, TimerMode } from '@/hooks/use-timer'
+import { TimerMode } from '@/hooks/use-timer'
 import { TimerSettingsDialog } from '@/components/timer-settings-dialog'
 import { TimerCountdown } from '@/components/timer-countdown'
+import { useTimerContext } from '@/contexts/timer-context'
 
 export function TimerDisplay() {
   const { 
@@ -14,7 +15,7 @@ export function TimerDisplay() {
     isRunning,
     settings,
     actions: { switchMode, toggleTimer, resetTimer, updateSettings }
-  } = useTimer()
+  } = useTimerContext()
 
   const modes = [
     { id: "focus" as TimerMode, label: "Focus", icon: Brain },

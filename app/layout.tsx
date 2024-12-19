@@ -7,6 +7,7 @@ import { TaskPanel } from '@/components/task-panel'
 import { GlobalLoader } from '@/components/global-loader'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { TimerProvider } from '@/contexts/timer-context'
 
 
 export const metadata: Metadata = {
@@ -23,19 +24,21 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <WorkspaceProvider>
-            <GlobalLoader>
-              <SpeedInsights />
+          <TimerProvider>
+            <WorkspaceProvider>
+              <GlobalLoader>
+                <SpeedInsights />
               <Analytics />
               <div className="flex h-screen bg-white">
                 <Sidebar />
                 <main className="flex-1 p-6">
-                  {children}
+                    {children}
                 </main>
-                <TaskPanel />
-              </div>
-            </GlobalLoader>
-          </WorkspaceProvider>
+                  <TaskPanel />
+                </div>
+              </GlobalLoader>
+            </WorkspaceProvider>
+          </TimerProvider>
         </AuthProvider>
       </body>
     </html>
