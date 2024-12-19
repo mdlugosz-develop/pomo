@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
 import { LogIn, LogOut } from "lucide-react"
 import { SignInDialog } from "./sign-in-dialog"
-import { SignUpDialog } from "./sign-up-dialog"
+import { ComingSoonDialog } from "./coming-soon-dialog"
 
 export function AuthButton() {
   const { user, signOut } = useAuth()
   const [showSignInDialog, setShowSignInDialog] = useState(false)
-  const [showSignUpDialog, setShowSignUpDialog] = useState(false)
+  const [showComingSoonDialog, setShowComingSoonDialog] = useState(false)
 
   const handleSignOut = async () => {
     try {
@@ -22,13 +22,14 @@ export function AuthButton() {
 
   const handleSignUpClick = () => {
     setShowSignInDialog(false)
-    setShowSignUpDialog(true)
+    setShowComingSoonDialog(true)
   }
 
-  const handleSignInClick = () => {
-    setShowSignUpDialog(false)
+/*   const handleSignInClick = () => {
+    setShowComingSoonDialog(false)
     setShowSignInDialog(true)
   }
+ */
 
   return (
     <>
@@ -56,10 +57,9 @@ export function AuthButton() {
         onSignUpClick={handleSignUpClick}
       />
 
-      <SignUpDialog
-        isOpen={showSignUpDialog}
-        onClose={() => setShowSignUpDialog(false)}
-        onSignInClick={handleSignInClick}
+      <ComingSoonDialog
+        isOpen={showComingSoonDialog}
+        onClose={() => setShowComingSoonDialog(false)}
       />
     </>
   )
