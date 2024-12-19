@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
 import { GlobalLoader } from '@/components/global-loader'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
         <AuthProvider>
           <WorkspaceProvider>
             <GlobalLoader>
+              <SpeedInsights />
               <Analytics />
               <div className="flex h-screen bg-white">
                 <Sidebar />
