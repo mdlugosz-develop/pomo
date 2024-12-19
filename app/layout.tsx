@@ -24,17 +24,21 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <WorkspaceProvider>
-            <GlobalLoader>
+          <TimerProvider>
+            <WorkspaceProvider>
+              <GlobalLoader>
+                <SpeedInsights />
+              <Analytics />
               <div className="flex h-screen bg-white">
                 <Sidebar />
                 <main className="flex-1 p-6">
-                  {children}
+                    {children}
                 </main>
-                <TaskPanel />
-              </div>
-            </GlobalLoader>
-          </WorkspaceProvider>
+                  <TaskPanel />
+                </div>
+              </GlobalLoader>
+            </WorkspaceProvider>
+          </TimerProvider>
         </AuthProvider>
       </body>
     </html>
