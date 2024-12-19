@@ -1,11 +1,29 @@
 'use client'
 
 import { useWorkspace } from "@/contexts/workspace-context"
+import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { AuthButton } from "@/components/auth-button"
 
 export default function TasksPage() {
+  const { user } = useAuth()
   const { workspaces, tasks } = useWorkspace()
+
+  // Show sign-in prompt for unauthenticated users
+  if (!user) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Card className="max-w-md p-6 text-center">
+          <h2 className="text-xl font-semibold mb-3">Sign in Required</h2>
+          <p className="text-gray-500 mb-6">
+            Please sign in to view your tasks and workspaces.
+          </p>
+          <AuthButton />
+        </Card>
+      </div>
+    )
+  }
 
   // Group tasks by workspace and status
   const workspaceData = workspaces.map(workspace => {
