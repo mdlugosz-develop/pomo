@@ -25,9 +25,9 @@ export default function RootLayout({
         <AuthProvider>
           <WorkspaceProvider>
             <TimerProvider>
-              <SpeedInsights />
-              <Analytics />
               <GlobalLoader>
+                <SpeedInsights />
+                <Analytics />
                 <div className="flex h-screen bg-white">
                   <Sidebar />
                   <main className="flex-1 p-6">
