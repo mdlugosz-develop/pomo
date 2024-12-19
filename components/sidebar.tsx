@@ -42,7 +42,7 @@ export function Sidebar() {
           )}
         >
           <ListTodo className="w-4 h-4" />
-          Tasks
+          Tasks Overview
         </Link>
       </nav>
 

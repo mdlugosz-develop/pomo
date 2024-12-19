@@ -41,19 +41,22 @@ export function TaskPanel() {
     })
   )
 
-  // Update the sorting to use order first
-  const activeTasks = tasks
+  // Filter tasks for current workspace
+  const currentWorkspaceTasks = tasks.filter(
+    task => task.workspace_id === currentWorkspace?.id
+  )
+
+  // Separate active and completed tasks
+  const activeTasks = currentWorkspaceTasks
     .filter(task => task.status !== 'completed')
     .sort((a, b) => {
-      // First sort by order
-      const orderA = a.order ?? Number.MAX_SAFE_INTEGER
-      const orderB = b.order ?? Number.MAX_SAFE_INTEGER
-      if (orderA !== orderB) return orderA - orderB
-      // Then by creation date if orders are equal
+      if (a.order !== b.order) {
+        return (a.order ?? 0) - (b.order ?? 0)
+      }
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
 
-  const completedTasks = tasks
+  const completedTasks = currentWorkspaceTasks
     .filter(task => task.status === 'completed')
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
@@ -83,8 +86,6 @@ export function TaskPanel() {
         await updateTaskOrder(updates, false)
       } catch (error) {
         console.error('Failed to update task order:', error)
-        // Optionally revert the UI if the database update fails
-        // fetchTasks() or similar recovery mechanism
       }
     }
   }
@@ -173,7 +174,7 @@ export function TaskPanel() {
         </div>
       )}
 
-      {tasks.length === 0 && (
+      {currentWorkspaceTasks.length === 0 && (
         <p className="text-sm text-gray-500 text-center py-4">
           No tasks yet
         </p>
