@@ -41,13 +41,13 @@ export function TaskPanel() {
     })
   )
 
-  // Filter tasks for current workspace
-  const currentWorkspaceTasks = tasks.filter(
-    task => task.workspace_id === currentWorkspace?.id
-  )
+  // Filter tasks based on authentication status
+  const filteredTasks = user 
+    ? tasks.filter(task => task.workspace_id === currentWorkspace?.id)
+    : tasks.filter(task => !task.workspace_id) // Show local tasks when not authenticated
 
   // Separate active and completed tasks
-  const activeTasks = currentWorkspaceTasks
+  const activeTasks = filteredTasks
     .filter(task => task.status !== 'completed')
     .sort((a, b) => {
       if (a.order !== b.order) {
@@ -56,7 +56,7 @@ export function TaskPanel() {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
 
-  const completedTasks = currentWorkspaceTasks
+  const completedTasks = filteredTasks
     .filter(task => task.status === 'completed')
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
@@ -174,7 +174,7 @@ export function TaskPanel() {
         </div>
       )}
 
-      {currentWorkspaceTasks.length === 0 && (
+      {filteredTasks.length === 0 && (
         <p className="text-sm text-gray-500 text-center py-4">
           No tasks yet
         </p>
@@ -182,48 +182,12 @@ export function TaskPanel() {
     </div>
   )
 
-  if (!user && !currentWorkspace) {
-    return (
-      <div className="w-[300px] border-l p-4">
-        <h2 className="font-medium mb-4">Tasks</h2>
-        <div className="mb-4">
-          <div className="flex gap-2">
-            <Input
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Add a task..."
-              className="flex-1"
-            />
-            <button
-              onClick={handleCreateTask}
-              className="p-2 hover:bg-gray-100 rounded"
-              disabled={!newTaskTitle.trim()}
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        <TaskList />
-      </div>
-    )
-  }
-
-  if (!currentWorkspace) {
-    return (
-      <div className="w-[300px] border-l p-4">
-        <h2 className="font-medium mb-4">Tasks</h2>
-        <p className="text-sm text-gray-500 text-center py-4">
-          Select a workspace to see tasks
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div className="w-[300px] border-l p-4">
       <div className="mb-4">
-        <h2 className="font-medium mb-4">Tasks</h2>
+        <h2 className="font-medium mb-4">
+          {user ? (currentWorkspace?.name || 'Select a workspace') : 'Local Tasks'}
+        </h2>
         <div className="flex gap-2">
           <Input
             value={newTaskTitle}
