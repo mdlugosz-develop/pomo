@@ -8,6 +8,7 @@ import { GlobalLoader } from '@/components/global-loader'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { TimerProvider } from '@/contexts/timer-context'
+import Link from 'next/link'
 
 
 export const metadata: Metadata = {
@@ -40,6 +41,17 @@ export default function RootLayout({
             </WorkspaceProvider>
           </TimerProvider>
         </AuthProvider>
+        
+        <footer className="text-center p-4 text-sm text-gray-500">
+          <div className="flex justify-center gap-4">
+            <Link href="/privacy" className="hover:text-gray-700">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-gray-700">
+              Terms of Use
+            </Link>
+          </div>
+        </footer>
       </body>
     </html>
   )

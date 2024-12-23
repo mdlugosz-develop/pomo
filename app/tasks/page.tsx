@@ -5,7 +5,6 @@ import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AuthButton } from "@/components/auth-button"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export default function TasksPage() {
   const { user } = useAuth()

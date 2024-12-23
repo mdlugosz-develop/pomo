@@ -7,6 +7,8 @@ const publicPaths = [
   '/',                    // Home page
   '/sounds',              // Public API routes
   '/tasks',               // Tasks page
+  '/privacy',             // Privacy page
+  '/terms',               // Terms page
 ]
 
 export async function middleware(req: NextRequest) {
