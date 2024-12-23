@@ -5,10 +5,11 @@ import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AuthButton } from "@/components/auth-button"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function TasksPage() {
   const { user } = useAuth()
-  const { workspaces, tasks } = useWorkspace()
+  const { workspaces, tasks, updateTask } = useWorkspace()
 
   // Show sign-in prompt for unauthenticated users
   if (!user) {
@@ -56,7 +57,8 @@ export default function TasksPage() {
                       {workspace.activeTasks.map(task => (
                         <div
                           key={task.id}
-                          className="p-3 bg-white rounded-lg border"
+                          className="p-3 bg-white rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors"
+                          onClick={() => updateTask(task.id, { status: 'completed' })}
                         >
                           <div className="flex items-center justify-between gap-3">
                             <span className="flex-1">{task.title}</span>
