@@ -29,13 +29,13 @@ export default function RootLayout({
             <WorkspaceProvider>
               <GlobalLoader>
                 <SpeedInsights />
-              <Analytics />
-              <div className="flex h-screen bg-white">
-                <Sidebar />
-                <main className="flex-1 p-6">
-                    {children}
-                </main>
-                  <TaskPanel />
+                <Analytics />
+                <div className="flex h-screen bg-white">
+                  <Sidebar />
+                  <main className="flex-1 p-6">
+                      {children}
+                  </main>
+                    <TaskPanel />
                 </div>
               </GlobalLoader>
             </WorkspaceProvider>

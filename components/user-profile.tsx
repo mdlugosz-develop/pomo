@@ -31,8 +31,6 @@ export function UserProfile() {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[200px]" align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem>
           <User className="mr-2 h-4 w-4" />
           Profile

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-
+import { useAuth } from '@/contexts/auth-context'
+import { supabase } from '@/lib/supabase'
 export type TimerMode = "focus" | "shortBreak" | "longBreak"
 
 export interface TimerSettings {
@@ -22,7 +23,7 @@ export function useTimer() {
   const [timeLeft, setTimeLeft] = useState(settings.focus)
   const [isRunning, setIsRunning] = useState(false)
   const [sessionCount, setSessionCount] = useState(0)
-
+  const { user } = useAuth()
   const bellRef = useRef<HTMLAudioElement | null>(null)
   const clickRef = useRef<HTMLAudioElement | null>(null)
 
@@ -41,6 +42,36 @@ export function useTimer() {
       }
     }
   }, [])
+
+  const fetchTimerSettings = useCallback(async () => {
+    if (user) {
+      const { data, error } = await supabase
+        .from('timer_settings')
+        .select('*')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching timer settings:', error);
+        return;
+      }
+
+      if (data) {
+        const newSettings = {
+          focus: data.focus_time * 60,
+          shortBreak: data.short_break * 60,
+          longBreak: data.long_break * 60,
+          longBreakInterval: 4
+        };
+        setSettings(newSettings);
+        setTimeLeft(newSettings[mode]);
+      }
+    }
+  }, [user, mode]);
+
+  useEffect(() => {
+    fetchTimerSettings();
+  }, [fetchTimerSettings]);
 
   const resetTimer = useCallback((newMode?: TimerMode) => {
     const timerMode = newMode || mode
@@ -63,11 +94,27 @@ export function useTimer() {
     setIsRunning(prev => !prev)
   }, [])
 
-  const updateSettings = useCallback((newSettings: TimerSettings) => {
-    setSettings(newSettings)
-    setIsRunning(false)
-    setTimeLeft(newSettings[mode])
-  }, [mode])
+  const updateSettings = useCallback(async (newSettings: TimerSettings) => {
+    if (user) {
+      const { error } = await supabase
+        .from('timer_settings')
+        .update({
+          focus_time: newSettings.focus / 60,
+          short_break: newSettings.shortBreak / 60,
+          long_break: newSettings.longBreak / 60
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating timer settings:', error);
+        return;
+      }
+    }
+    
+    setSettings(newSettings);
+    setIsRunning(false);
+    setTimeLeft(newSettings[mode]);
+  }, [mode, user]);
 
   const nextSession = useCallback(() => {
     if (mode === "focus") {
@@ -108,6 +155,10 @@ export function useTimer() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
+  useEffect(() => {
+    setTimeLeft(settings[mode])
+  }, [settings, mode])
+
   return {
     mode,
     timeLeft,
@@ -116,10 +167,11 @@ export function useTimer() {
     settings,
     formattedTime: formatTime(timeLeft),
     actions: {
-      switchMode: (newMode: TimerMode) => switchMode(newMode, false), // Manual mode switch doesn't auto-start
+      switchMode: (newMode: TimerMode) => switchMode(newMode, false),
       toggleTimer,
       resetTimer,
       updateSettings,
+      refreshSettings: fetchTimerSettings,
     }
   }
 } 
