@@ -12,6 +12,7 @@ interface AuthContextType {
   loading: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<void>
+  signUpWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -20,7 +21,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -71,6 +71,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const signUpWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    })
+    
+    if (error) throw error
+    
+    // Note: The access token will be handled by the auth state change listener
+    // after the OAuth redirect
+  }
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -80,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signUpWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   )
