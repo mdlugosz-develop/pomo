@@ -9,6 +9,7 @@ const publicPaths = [
   '/tasks',               // Tasks page
   '/privacy',             // Privacy page
   '/terms',               // Terms page
+  '/auth/callback',       // Auth callback page
 ]
 
 export async function middleware(req: NextRequest) {
