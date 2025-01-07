@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
 import { Task, Workspace } from '../lib/types'
+import { WorkspaceLimitModal } from '@/components/workspace-limit-modal'
 
 // Add a key for localStorage
 const LOCAL_TASKS_KEY = 'local_tasks'
@@ -45,6 +46,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
 
   // Load local tasks on initial mount
   useEffect(() => {
@@ -163,6 +165,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     if (!user) {
       setError('You must be signed in to create a workspace')
       throw new Error('You must be signed in to create a workspace')
+    }
+
+    const workspacesCount = workspaces.length
+    if (workspacesCount >= 2) {
+      setShowLimitModal(true)
+      return
     }
 
     try {
@@ -382,6 +390,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
+      <WorkspaceLimitModal 
+        isOpen={showLimitModal} 
+        onClose={() => setShowLimitModal(false)} 
+      />
     </WorkspaceContext.Provider>
   )
 }
