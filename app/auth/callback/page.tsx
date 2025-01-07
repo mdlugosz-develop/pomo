@@ -9,8 +9,8 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     // Handle the OAuth callback
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
+    supabase.auth.onAuthStateChange((session) => {
+      if (session) {
         router.push('/') // Redirect to home page after successful sign in
       }
     })
