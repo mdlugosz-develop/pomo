@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const handlePasswordChange = async () => {
     try {
       setLoading(true)
+       // eslint-disable-next-line no-unused-vars
       const response = await supabase.auth.updateUser({
         password: newPassword
       })
