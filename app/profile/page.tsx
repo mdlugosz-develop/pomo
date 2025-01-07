@@ -18,13 +18,12 @@ export default function ProfilePage() {
   const handlePasswordChange = async () => {
     try {
       setLoading(true)
-      const { error } = await supabase.auth.updateUser({
+      const response = await supabase.auth.updateUser({
         password: newPassword
       })
 
-      if (error) {
-        console.log(error)
-        throw error
+      if (response.error) {
+        throw response.error
       }
 
       toast({
