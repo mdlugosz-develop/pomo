@@ -10,9 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogOut, Settings, User } from "lucide-react"
-
+import { useRouter } from "next/navigation"
 export function UserProfile() {
   const { user, signOut } = useAuth()
+  const router = useRouter()
 
   if (!user) return null
 
@@ -30,7 +31,7 @@ export function UserProfile() {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[200px]" align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push('/profile')}>
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>
