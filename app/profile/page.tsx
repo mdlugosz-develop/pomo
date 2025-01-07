@@ -22,7 +22,10 @@ export default function ProfilePage() {
         password: newPassword
       })
 
-      if (error) throw error
+      if (error) {
+        console.log(error)
+        throw error
+      }
 
       toast({
         title: 'Success',
