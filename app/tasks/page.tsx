@@ -41,14 +41,14 @@ export default function TasksPage() {
         <h1 className="text-2xl font-semibold">Workspaces & Tasks</h1>
       </div>
       
-      <div className="flex-1 overflow-auto px-6 pb-6">
+      <div className="flex-1 overflow-auto px-3 sm:px-6 pb-6">
         <div className="max-w-5xl mx-auto">
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {workspaceData.map((workspace) => (
-              <Card key={workspace.id} className="p-6">
-                <h2 className="text-xl font-medium mb-6">{workspace.name}</h2>
+              <Card key={workspace.id} className="p-4 sm:p-6">
+                <h2 className="text-xl font-medium mb-4 sm:mb-6">{workspace.name}</h2>
 
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
                   {/* Active Tasks */}
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-3">Active Tasks</h3>
