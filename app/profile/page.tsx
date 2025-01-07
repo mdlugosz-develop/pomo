@@ -18,14 +18,10 @@ export default function ProfilePage() {
   const handlePasswordChange = async () => {
     try {
       setLoading(true)
-       // eslint-disable-next-line no-unused-vars
-      const response = await supabase.auth.updateUser({
+
+      await supabase.auth.updateUser({
         password: newPassword
       })
-
-      if (response.error) {
-        throw response.error
-      }
 
       toast({
         title: 'Success',
@@ -33,6 +29,7 @@ export default function ProfilePage() {
       })
       setNewPassword('')
     } catch (error) {
+      console.log(error)
       toast({
         title: 'Error',
         description: 'Failed to update password',
