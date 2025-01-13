@@ -2,11 +2,11 @@
 
 import { Home, ListTodo } from 'lucide-react'
 import Link from "next/link"
+import Image from "next/image"
 import { AuthButton } from "@/components/auth-button"
 import { Workspaces } from '@/components/workspaces'
 import { UserProfile } from './user-profile'
 import { useAuth } from '@/contexts/auth-context'
-import { Clock } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { MiniTimer } from './mini-timer'
@@ -19,7 +19,12 @@ export function Sidebar() {
   return (
     <div className="w-[300px] border-r p-4 flex flex-col h-full">
       <div className="flex items-center gap-2 mb-6">
-        <Clock />
+        <Image 
+          src="/images/logo.png"
+          alt="PomoTime Logo"
+          width={35}
+          height={35}
+        />
         <h1 className="font-medium">PomoTime</h1>
       </div>
       
