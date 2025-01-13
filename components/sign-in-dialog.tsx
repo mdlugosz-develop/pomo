@@ -19,16 +19,19 @@ export function SignInDialog({
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { signIn, signUpWithGoogle } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
     try {
       await signIn(email, password)
       onClose()
     } catch (error) {
       console.error('Error signing in:', error)
+      setError('Invalid email or password. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -124,6 +127,13 @@ export function SignInDialog({
                 required
               />
             </div>
+            
+            {error && (
+              <div className="text-sm text-red-500 mt-2">
+                {error}
+              </div>
+            )}
+            
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
