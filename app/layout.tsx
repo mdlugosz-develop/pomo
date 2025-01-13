@@ -35,7 +35,7 @@ export default function RootLayout({
                   <main className="flex-1 p-6">
                       {children}
                   </main>
-                    <TaskPanel />
+                  <TaskPanel />
                 </div>
               </GlobalLoader>
             </WorkspaceProvider>

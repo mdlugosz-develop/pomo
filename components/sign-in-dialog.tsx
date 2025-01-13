@@ -65,9 +65,9 @@ export function SignInDialog({
           <Button 
             type="button" 
             variant="outline" 
-            className="w-full" 
+            className="w-full opacity-50 cursor-not-allowed" 
             onClick={handleGoogleSignIn}
-            disabled={isLoading}
+            disabled={true}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -87,7 +87,7 @@ export function SignInDialog({
                 fill="#EA4335"
               />
             </svg>
-            Sign in with Google
+            Sign in with Google (Coming Soon)
           </Button>
           
           <div className="relative">
