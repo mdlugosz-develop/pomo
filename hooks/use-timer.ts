@@ -30,6 +30,7 @@ export function useTimer() {
   const startTimeRef = useRef<number | null>(null)
   const animationFrameRef = useRef<number>()
   const isVisibleRef = useRef(true)
+  const pausedTimeRef = useRef<number | null>(null)
 
   // Initialize audio elements
   useEffect(() => {
@@ -55,11 +56,17 @@ export function useTimer() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       isVisibleRef.current = document.visibilityState === 'visible'
-      if (isVisibleRef.current && isRunning && startTimeRef.current) {
-        // Adjust start time to account for time passed while hidden
-        const now = performance.now()
-        const elapsedWhileHidden = now - startTimeRef.current
-        startTimeRef.current = now - elapsedWhileHidden
+      
+      if (isVisibleRef.current) {
+        if (isRunning && startTimeRef.current) {
+          // Adjust start time to account for time passed while hidden
+          const now = performance.now()
+          const elapsedWhileHidden = now - startTimeRef.current
+          startTimeRef.current = now - elapsedWhileHidden
+        } else if (!isRunning && pausedTimeRef.current) {
+          // Restore the paused time when returning to the tab
+          setTimeLeft(pausedTimeRef.current)
+        }
       }
     }
 
@@ -90,7 +97,10 @@ export function useTimer() {
           longBreakInterval: 4
         };
         setSettings(newSettings);
-        setTimeLeft(newSettings[mode]);
+        // Only set initial time if we're not in a paused state
+        if (!pausedTimeRef.current) {
+          setTimeLeft(newSettings[mode]);
+        }
       }
     }
   }, [user, mode]);
@@ -104,6 +114,7 @@ export function useTimer() {
     setTimeLeft(settings[timerMode])
     if (newMode) setMode(newMode)
     startTimeRef.current = null
+    pausedTimeRef.current = null
   }, [mode, settings])
 
   const switchMode = useCallback((newMode: TimerMode, autoStart: boolean = false) => {
@@ -120,13 +131,27 @@ export function useTimer() {
     clickRef.current?.play().catch(error => console.error('Error playing sound:', error))
     setIsRunning(prev => {
       if (!prev) {
-        startTimeRef.current = performance.now()
+        // Starting the timer
+        const now = performance.now()
+        if (pausedTimeRef.current) {
+          // When resuming, we want to start from the paused time
+          // Calculate how much time has elapsed since the timer started
+          const elapsedBeforePause = settings[mode] - pausedTimeRef.current
+          // Set the start time to now minus the elapsed time
+          startTimeRef.current = now - (elapsedBeforePause * 1000)
+        } else {
+          // Starting fresh
+          startTimeRef.current = now
+        }
+       
       } else {
+        // Pausing the timer
         startTimeRef.current = null
+        pausedTimeRef.current = timeLeft
       }
       return !prev
     })
-  }, [])
+  }, [timeLeft, mode, settings])
 
   const updateSettings = useCallback(async (newSettings: TimerSettings) => {
     if (user) {
@@ -149,6 +174,7 @@ export function useTimer() {
     setIsRunning(false);
     setTimeLeft(newSettings[mode]);
     startTimeRef.current = null
+    pausedTimeRef.current = null
   }, [mode, user]);
 
   const nextSession = useCallback(() => {
@@ -194,10 +220,6 @@ export function useTimer() {
       }
     }
   }, [isRunning, mode, settings, nextSession])
-
-  useEffect(() => {
-    setTimeLeft(settings[mode])
-  }, [settings, mode])
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)
