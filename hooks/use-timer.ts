@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { supabase } from '@/lib/supabase'
+
 export type TimerMode = "focus" | "shortBreak" | "longBreak"
 
 export interface TimerSettings {
@@ -26,7 +27,11 @@ export function useTimer() {
   const { user } = useAuth()
   const bellRef = useRef<HTMLAudioElement | null>(null)
   const clickRef = useRef<HTMLAudioElement | null>(null)
+  const startTimeRef = useRef<number | null>(null)
+  const animationFrameRef = useRef<number>()
+  const isVisibleRef = useRef(true)
 
+  // Initialize audio elements
   useEffect(() => {
     bellRef.current = new Audio('/sounds/bell.mp3')
     clickRef.current = new Audio('/sounds/click.wav')
@@ -40,8 +45,29 @@ export function useTimer() {
         clickRef.current.pause()
         clickRef.current = null
       }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
     }
   }, [])
+
+  // Handle page visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = document.visibilityState === 'visible'
+      if (isVisibleRef.current && isRunning && startTimeRef.current) {
+        // Adjust start time to account for time passed while hidden
+        const now = performance.now()
+        const elapsedWhileHidden = now - startTimeRef.current
+        startTimeRef.current = now - elapsedWhileHidden
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [isRunning])
 
   const fetchTimerSettings = useCallback(async () => {
     if (user) {
@@ -77,6 +103,7 @@ export function useTimer() {
     const timerMode = newMode || mode
     setTimeLeft(settings[timerMode])
     if (newMode) setMode(newMode)
+    startTimeRef.current = null
   }, [mode, settings])
 
   const switchMode = useCallback((newMode: TimerMode, autoStart: boolean = false) => {
@@ -91,7 +118,14 @@ export function useTimer() {
 
   const toggleTimer = useCallback(() => {
     clickRef.current?.play().catch(error => console.error('Error playing sound:', error))
-    setIsRunning(prev => !prev)
+    setIsRunning(prev => {
+      if (!prev) {
+        startTimeRef.current = performance.now()
+      } else {
+        startTimeRef.current = null
+      }
+      return !prev
+    })
   }, [])
 
   const updateSettings = useCallback(async (newSettings: TimerSettings) => {
@@ -114,6 +148,7 @@ export function useTimer() {
     setSettings(newSettings);
     setIsRunning(false);
     setTimeLeft(newSettings[mode]);
+    startTimeRef.current = null
   }, [mode, user]);
 
   const nextSession = useCallback(() => {
@@ -122,42 +157,53 @@ export function useTimer() {
       setSessionCount(newSessionCount)
       
       if (newSessionCount % settings.longBreakInterval === 0) {
-        switchMode("longBreak", true) // Auto-start the long break
+        switchMode("longBreak", true)
       } else {
-        switchMode("shortBreak", true) // Auto-start the short break
+        switchMode("shortBreak", true)
       }
     } else {
-      switchMode("focus", true) // Auto-start the focus session
+      switchMode("focus", true)
     }
   }, [mode, sessionCount, switchMode, settings])
 
+  // Timer update logic using requestAnimationFrame
   useEffect(() => {
-    let interval: NodeJS.Timeout
-
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            nextSession()
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+    const updateTimer = () => {
+      if (isRunning && startTimeRef.current) {
+        const now = performance.now()
+        const elapsed = Math.floor((now - startTimeRef.current) / 1000)
+        const remaining = Math.max(0, settings[mode] - elapsed)
+        
+        setTimeLeft(remaining)
+        
+        if (remaining <= 0) {
+          nextSession()
+        } else {
+          animationFrameRef.current = requestAnimationFrame(updateTimer)
+        }
+      }
     }
 
-    return () => clearInterval(interval)
-  }, [isRunning, timeLeft, nextSession])
+    if (isRunning) {
+      animationFrameRef.current = requestAnimationFrame(updateTimer)
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [isRunning, mode, settings, nextSession])
+
+  useEffect(() => {
+    setTimeLeft(settings[mode])
+  }, [settings, mode])
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
-
-  useEffect(() => {
-    setTimeLeft(settings[mode])
-  }, [settings, mode])
 
   return {
     mode,
