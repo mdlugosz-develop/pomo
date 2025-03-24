@@ -15,7 +15,7 @@ const publicPaths = [
 
 const ACCESS_TOKEN_KEY = 'access_token'
 const LAST_ACTIVITY_KEY = 'last_activity'
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 hour in milliseconds
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 minute in milliseconds (for testing)
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()

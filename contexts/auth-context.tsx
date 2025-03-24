@@ -11,8 +11,8 @@ const LAST_ACTIVITY_KEY = 'last_activity'
 const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 // Token refresh interval - refresh token every 23 hours
 const TOKEN_REFRESH_INTERVAL = 23 * 60 * 60 * 1000 // 23 hours in milliseconds
-// Inactivity timeout - 1 hour
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 hour in milliseconds
+// Inactivity timeout - 1 minute (for testing)
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 minute in milliseconds
 
 interface AuthContextType {
   user: User | null
@@ -32,9 +32,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
   const activityTimerRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Check for inactivity
+  const checkInactivity = () => {
+    const lastActivity = Cookies.get(LAST_ACTIVITY_KEY)
+    if (lastActivity) {
+      const inactiveTime = Date.now() - parseInt(lastActivity)
+      console.log(`Inactivity check: ${inactiveTime / 1000}s since last activity, timeout at ${INACTIVITY_TIMEOUT / 1000}s`)
+      if (inactiveTime > INACTIVITY_TIMEOUT) {
+        console.log('User inactive, signing out')
+        signOut()
+      }
+    }
+  }
+
   // Update the last activity timestamp
   const updateLastActivity = () => {
     const now = Date.now()
+    console.log('Activity detected, updating timestamp')
     Cookies.set(LAST_ACTIVITY_KEY, now.toString(), { expires: 1 }) // 1 day
   }
 
@@ -62,18 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Check for inactivity
-  const checkInactivity = () => {
-    const lastActivity = Cookies.get(LAST_ACTIVITY_KEY)
-    if (lastActivity) {
-      const inactiveTime = Date.now() - parseInt(lastActivity)
-      if (inactiveTime > INACTIVITY_TIMEOUT) {
-        console.log('User inactive, signing out')
-        signOut()
-      }
-    }
-  }
-
   // Setup activity tracking
   useEffect(() => {
     const setupActivityTracking = () => {
@@ -91,8 +93,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Initialize
       updateLastActivity()
       
-      // Set up periodic inactivity checks
-      activityTimerRef.current = setInterval(checkInactivity, 5 * 60 * 1000) // Check every 5 minutes
+      // Set up periodic inactivity checks - check every 10 seconds for testing
+      activityTimerRef.current = setInterval(checkInactivity, 5 * 60 * 1000) 
       
       return () => {
         events.forEach(event => {
