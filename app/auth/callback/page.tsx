@@ -4,11 +4,12 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Cookies from 'js-cookie'
-
-// Constants for session management (matching auth-context.tsx)
-const ACCESS_TOKEN_KEY = 'access_token'
-const LAST_ACTIVITY_KEY = 'last_activity'
-const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+import {
+  ACCESS_TOKEN_KEY,
+  LAST_ACTIVITY_KEY,
+  SESSION_DURATION,
+  DEBUG_AUTH
+} from '@/lib/security-constants'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
@@ -18,10 +19,16 @@ export default function AuthCallbackPage() {
     const updateLastActivity = () => {
       const now = Date.now()
       Cookies.set(LAST_ACTIVITY_KEY, now.toString(), { expires: 1 }) // 1 day
+      if (DEBUG_AUTH) {
+        console.log('Auth callback: Setting last activity timestamp')
+      }
     }
     
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
+      if (DEBUG_AUTH) {
+        console.log('Auth callback: Processing authentication')
+      }
       const { data, error } = await supabase.auth.getSession()
       
       if (error) {
@@ -36,8 +43,14 @@ export default function AuthCallbackPage() {
           expires: new Date(Date.now() + SESSION_DURATION) 
         })
         updateLastActivity()
+        if (DEBUG_AUTH) {
+          console.log('Auth callback: Authentication successful, redirecting')
+        }
         router.push('/') // Redirect to home page after successful sign in
       } else {
+        if (DEBUG_AUTH) {
+          console.log('Auth callback: No session data, redirecting to home')
+        }
         router.push('/')
       }
     }
