@@ -4,15 +4,15 @@ import { createContext, useContext, useEffect, useState, useRef } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import Cookies from 'js-cookie'
-
-const ACCESS_TOKEN_KEY = 'access_token'
-const LAST_ACTIVITY_KEY = 'last_activity'
-// Session timeout after 24 hours
-const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-// Token refresh interval - refresh token every 23 hours
-const TOKEN_REFRESH_INTERVAL = 23 * 60 * 60 * 1000 // 23 hours in milliseconds
-// Inactivity timeout - 1 minute (for testing)
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 minute in milliseconds
+import {
+  ACCESS_TOKEN_KEY,
+  LAST_ACTIVITY_KEY,
+  SESSION_DURATION,
+  INACTIVITY_TIMEOUT,
+  INACTIVITY_CHECK_INTERVAL,
+  TOKEN_REFRESH_INTERVAL,
+  DEBUG_AUTH
+} from '@/lib/security-constants'
 
 interface AuthContextType {
   user: User | null
@@ -37,9 +37,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const lastActivity = Cookies.get(LAST_ACTIVITY_KEY)
     if (lastActivity) {
       const inactiveTime = Date.now() - parseInt(lastActivity)
-      console.log(`Inactivity check: ${inactiveTime / 1000}s since last activity, timeout at ${INACTIVITY_TIMEOUT / 1000}s`)
+      if (DEBUG_AUTH) {
+        console.log(`Inactivity check: ${inactiveTime / 1000}s since last activity, timeout at ${INACTIVITY_TIMEOUT / 1000}s`)
+      }
       if (inactiveTime > INACTIVITY_TIMEOUT) {
-        console.log('User inactive, signing out')
+        if (DEBUG_AUTH) {
+          console.log('User inactive, signing out')
+        }
         signOut()
       }
     }
@@ -48,7 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Update the last activity timestamp
   const updateLastActivity = () => {
     const now = Date.now()
-    console.log('Activity detected, updating timestamp')
+    if (DEBUG_AUTH) {
+      console.log('Activity detected, updating timestamp')
+    }
     Cookies.set(LAST_ACTIVITY_KEY, now.toString(), { expires: 1 }) // 1 day
   }
 
@@ -70,6 +76,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           expires: new Date(Date.now() + SESSION_DURATION)
         })
         updateLastActivity()
+        if (DEBUG_AUTH) {
+          console.log('Session refreshed successfully')
+        }
       }
     } catch (err) {
       console.error('Failed to refresh session:', err)
@@ -93,8 +102,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Initialize
       updateLastActivity()
       
-      // Set up periodic inactivity checks - check every 10 seconds for testing
-      activityTimerRef.current = setInterval(checkInactivity, 5 * 60 * 1000) 
+      // Set up periodic inactivity checks
+      activityTimerRef.current = setInterval(
+        checkInactivity, 
+        DEBUG_AUTH ? 10 * 1000 : INACTIVITY_CHECK_INTERVAL
+      )
       
       return () => {
         events.forEach(event => {

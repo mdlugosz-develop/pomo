@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { cookies } from 'next/headers'
+import {
+  ACCESS_TOKEN_KEY,
+  LAST_ACTIVITY_KEY,
+  INACTIVITY_TIMEOUT
+} from '@/lib/security-constants'
+
 // Add paths that should be accessible without authentication
 const publicPaths = [
   '/',                    // Home page
@@ -12,10 +18,6 @@ const publicPaths = [
   '/auth/callback',       // Auth callback page
   '/profile',             // Profile page
 ]
-
-const ACCESS_TOKEN_KEY = 'access_token'
-const LAST_ACTIVITY_KEY = 'last_activity'
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000 // 1 minute in milliseconds (for testing)
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
