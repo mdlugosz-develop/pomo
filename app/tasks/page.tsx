@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AuthButton } from "@/components/auth-button"
+import Script from 'next/script'
 
 export default function TasksPage() {
   const { user } = useAuth()
@@ -37,6 +38,16 @@ export default function TasksPage() {
 
   return (
     <div className="h-full flex flex-col">
+      <Script id="tasks-structured-data" type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Task Management with Pomodoro Technique",
+          "description": "Manage your tasks efficiently with PomoTime using the Pomodoro technique.",
+          "url": "https://pomotime.io/tasks"
+        })
+      }} />
+
       <div className="flex-none p-6">
         <h1 className="text-2xl font-semibold">Workspaces & Tasks</h1>
       </div>

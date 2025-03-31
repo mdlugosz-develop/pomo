@@ -17,27 +17,31 @@ export function Sidebar() {
   const showMiniTimer = pathname !== '/'
 
   return (
-    <div className="w-[300px] border-r p-4 flex flex-col h-full">
+    <aside className="w-[300px] border-r p-4 flex flex-col h-full" aria-label="Application navigation">
       <div className="flex items-center gap-2 mb-6">
-        <Image 
-          src="/images/logo.png"
-          alt="PomoTime Logo"
-          width={35}
-          height={35}
-        />
+        <Link href="/">
+          <Image 
+            src="/images/logo.png"
+            alt="PomoTime Logo"
+            width={35}
+            height={35}
+            priority
+          />
+        </Link>
         <h1 className="font-medium">PomoTime</h1>
       </div>
       
-      <nav className="space-y-2">
+      <nav className="space-y-2" aria-label="Main Navigation">
         <Link
           href="/"
           className={cn(
             "flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-md",
             pathname === "/" && "bg-gray-100"
           )}
+          aria-current={pathname === "/" ? "page" : undefined}
         >
-          <Home className="w-4 h-4" />
-          Dashboard
+          <Home className="w-4 h-4" aria-hidden="true" />
+          <span>Dashboard</span>
         </Link>
         <Link
           href="/tasks"
@@ -45,16 +49,17 @@ export function Sidebar() {
             "flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-md",
             pathname === "/tasks" && "bg-gray-100"
           )}
+          aria-current={pathname === "/tasks" ? "page" : undefined}
         >
-          <ListTodo className="w-4 h-4" />
-          Tasks Overview
+          <ListTodo className="w-4 h-4" aria-hidden="true" />
+          <span>Tasks Overview</span>
         </Link>
       </nav>
 
       <Workspaces />
 
       {showMiniTimer && (
-        <div className="mt-4 p-3 border rounded-lg bg-white">
+        <div className="mt-4 p-3 border rounded-lg bg-white" aria-label="Mini timer">
           <MiniTimer />
         </div>
       )}
@@ -63,7 +68,7 @@ export function Sidebar() {
         {!user && <AuthButton />}
         {user && <UserProfile />}
       </div>
-    </div>
+    </aside>
   )
 }
 

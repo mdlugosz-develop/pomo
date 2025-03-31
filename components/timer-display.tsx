@@ -24,51 +24,58 @@ export function TimerDisplay() {
    ]
 
   return (
-    <Card className="w-full min-w-0">
-      <CardContent className="pt-6 overflow-hidden">
-        {/* Timer Mode Selection */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8 px-2">
-          {modes.map((modeOption) => (
-            <Button
-              key={modeOption.id}
-              variant={mode === modeOption.id ? "default" : "ghost"}
-              className="gap-2 whitespace-nowrap"
-              onClick={() => switchMode(modeOption.id)}
+    <section aria-labelledby="timer-heading">
+      <h2 id="timer-heading" className="text-xl font-semibold mb-4">Pomodoro Timer</h2>
+      <Card className="w-full min-w-0">
+        <CardContent className="pt-6 overflow-hidden">
+          {/* Timer Mode Selection */}
+          <nav aria-label="Timer modes" className="flex flex-wrap justify-center gap-2 mb-8 px-2">
+            {modes.map((modeOption) => (
+              <Button
+                key={modeOption.id}
+                variant={mode === modeOption.id ? "default" : "ghost"}
+                className="gap-2 whitespace-nowrap"
+                onClick={() => switchMode(modeOption.id)}
+                aria-pressed={mode === modeOption.id}
+                aria-label={`${modeOption.label} mode`}
+              >
+                <modeOption.icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                {modeOption.label}
+              </Button>
+            ))}
+          </nav>
+
+          {/* Timer Display */}
+          <div className="flex justify-center mb-8" aria-live="polite" role="timer">
+            <TimerCountdown formattedTime={formattedTime} />
+          </div>
+
+          {/* Timer Controls */}
+          <div className="flex justify-center gap-2" role="group" aria-label="Timer controls">
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={toggleTimer}
+              aria-label={isRunning ? "Stop timer" : "Start timer"}
             >
-              <modeOption.icon className="h-4 w-4 flex-shrink-0" />
-              {modeOption.label}
+              {isRunning ? <StopIcon className="h-4 w-4" aria-hidden="true" /> : <PlayIcon className="h-4 w-4" aria-hidden="true" />}
             </Button>
-          ))}
-        </div>
-
-        {/* Timer Display */}
-        <div className="flex justify-center mb-8">
-          <TimerCountdown formattedTime={formattedTime} />
-        </div>
-
-        {/* Timer Controls */}
-        <div className="flex justify-center gap-2">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={toggleTimer}
-          >
-            {isRunning ? <StopIcon className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => resetTimer()}
-          >
-            <RefreshCcw className="h-4 w-4" />
-          </Button>
-          <TimerSettingsDialog 
-            settings={settings}
-            onSave={updateSettings}
-          />
-        </div>
-      </CardContent>
-    </Card>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => resetTimer()}
+              aria-label="Reset timer"
+            >
+              <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+            </Button>
+            <TimerSettingsDialog 
+              settings={settings}
+              onSave={updateSettings}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </section>
   )
 }
 
