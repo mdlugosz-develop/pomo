@@ -17,6 +17,7 @@ const publicPaths = [
   '/terms',               // Terms page
   '/auth/callback',       // Auth callback page
   '/profile',             // Profile page
+  '/about'                 // About page
 ]
 
 export async function middleware(req: NextRequest) {
