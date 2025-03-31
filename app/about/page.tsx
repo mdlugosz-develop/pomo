@@ -42,7 +42,7 @@ export default function AboutPage() {
           <a href="https://www.pomodorotechnique.com/#" style={{ color: 'blue', fontWeight: 'bold' }}>The Pomodoro Technique</a> is a time management method developed by Francesco Cirillo in the late 1980s. 
             
             The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, 
-            separated by short breaks of 5 minutes. Each interval is known as a "pomodoro," the Italian word for tomato, 
+            separated by short breaks of 5 minutes. Each interval is known as a &quot;pomodoro,&quot; the Italian word for tomato, 
             after the tomato-shaped kitchen timer that Cirillo used as a university student.
           </p>
           <p>
@@ -54,7 +54,7 @@ export default function AboutPage() {
         <Card className="p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">How Does It Work?</h2>
           <ol className="list-decimal pl-5 space-y-2 mb-4">
-            <li><strong>Choose a task</strong> you'd like to get done</li>
+            <li><strong>Choose a task</strong> you&apos;d like to get done</li>
             <li><strong>Set the timer</strong> for 25 minutes</li>
             <li><strong>Work on the task</strong> until the timer rings</li>
             <li>When the timer rings, <strong>put a checkmark</strong> on a piece of paper</li>
@@ -62,7 +62,7 @@ export default function AboutPage() {
             <li>After four pomodoros, <strong>take a longer break</strong> (15-30 minutes)</li>
           </ol>
           <p>
-            The technique's simplicity and effectiveness have made it popular worldwide, and it has been adapted 
+            The technique&apos;s simplicity and effectiveness have made it popular worldwide, and it has been adapted 
             into numerous applications and digital tools, including PomoTime.
           </p>
         </Card>
