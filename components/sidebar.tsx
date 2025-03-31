@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, ListTodo } from 'lucide-react'
+import { Home, ListTodo, Info } from 'lucide-react'
 import Link from "next/link"
 import Image from "next/image"
 import { AuthButton } from "@/components/auth-button"
@@ -17,7 +17,7 @@ export function Sidebar() {
   const showMiniTimer = pathname !== '/'
 
   return (
-    <aside className="w-[300px] border-r p-4 flex flex-col h-full" aria-label="Application navigation">
+    <aside className="w-[300px] border-r p-4 flex flex-col h-screen" aria-label="Application navigation">
       <div className="flex items-center gap-2 mb-6">
         <Link href="/">
           <Image 
@@ -31,7 +31,7 @@ export function Sidebar() {
         <h1 className="font-medium">PomoTime</h1>
       </div>
       
-      <nav className="space-y-2" aria-label="Main Navigation">
+      <nav className="space-y-2 mb-6" aria-label="Main Navigation">
         <Link
           href="/"
           className={cn(
@@ -54,6 +54,17 @@ export function Sidebar() {
           <ListTodo className="w-4 h-4" aria-hidden="true" />
           <span>Tasks Overview</span>
         </Link>
+        <Link
+          href="/about"
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 rounded-md",
+            pathname === "/about" && "bg-gray-100"
+          )}
+          aria-current={pathname === "/about" ? "page" : undefined}
+        >
+          <Info className="w-4 h-4" aria-hidden="true" />
+          <span>About</span>
+        </Link>
       </nav>
 
       <Workspaces />
@@ -64,7 +75,7 @@ export function Sidebar() {
         </div>
       )}
 
-      <div className="mt-auto pb-4">
+      <div className="mt-auto pt-4">
         {!user && <AuthButton />}
         {user && <UserProfile />}
       </div>
