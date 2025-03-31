@@ -102,3 +102,40 @@ main {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Mobile responsive styles */
+@media (max-width: 767px) {
+  main {
+    max-height: calc(100vh - 5rem);
+    padding-top: 3.5rem; /* Space for the mobile menu buttons */
+  }
+  
+  /* Adjust font sizes for mobile */
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+  }
+  
+  /* Ensure buttons are larger on mobile for touch targets */
+  button, 
+  .button,
+  a[role="button"] {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+  }
+  
+  /* Ensure form elements are easier to interact with on mobile */
+  input, 
+  select, 
+  textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    min-height: 2.5rem;
+  }
+}

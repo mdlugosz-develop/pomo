@@ -6,7 +6,7 @@ import Script from 'next/script'
 
 export default function Home() {
   return (
-    <div className="container max-w-5xl mx-auto px-4 py-8">
+    <div className="container max-w-5xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
       <Script id="structured-data" type="application/ld+json" dangerouslySetInnerHTML={{
         __html: JSON.stringify({
           "@context": "https://schema.org",

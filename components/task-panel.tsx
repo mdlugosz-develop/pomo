@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, KeyboardEvent } from 'react'
+import { useState, KeyboardEvent, useEffect } from 'react'
 import { useWorkspace } from '@/contexts/workspace-context'
-import { Plus, ChevronDown, ChevronRight } from 'lucide-react'
+import { Plus, ChevronDown, ChevronRight, ClipboardList, X } from 'lucide-react'
 import { Input } from './ui/input'
 import { useAuth } from '@/contexts/auth-context'
 import { TaskItem } from './task-item'
+import { cn } from '@/lib/utils'
 import {
   DndContext,
   DragEndEvent,
@@ -25,6 +26,24 @@ export function TaskPanel() {
   const { currentWorkspace, tasks, createTask, updateTask, deleteTask, updateTaskOrder } = useWorkspace()
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [showCompleted, setShowCompleted] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Handle responsive layout
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    // Check on initial load
+    checkIfMobile()
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile)
+    
+    // Clean up event listener
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
 
   // Configure sensors for drag detection
   const sensors = useSensors(
@@ -183,30 +202,59 @@ export function TaskPanel() {
   )
 
   return (
-    <div className="w-[300px] border-l p-4">
-      <div className="mb-4">
-        <h2 className="font-medium mb-4">
-          {user ? (currentWorkspace?.name || 'Select a workspace') : 'Local Tasks'}
-        </h2>
-        <div className="flex gap-2">
-          <Input
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Add a task..."
-            className="flex-1"
-          />
-          <button
-            onClick={handleCreateTask}
-            className="p-2 hover:bg-gray-100 rounded"
-            disabled={!newTaskTitle.trim()}
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+    <>
+      {/* Mobile toggle button */}
+      {isMobile && (
+        <button 
+          className="fixed top-4 right-4 z-30 p-2 bg-white rounded-md shadow-md md:hidden"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close tasks" : "Open tasks"}
+        >
+          {isOpen ? <X className="w-5 h-5" /> : <ClipboardList className="w-5 h-5" />}
+        </button>
+      )}
+
+      {/* Task panel */}
+      <div 
+        className={cn(
+          "w-full md:w-[300px] border-l p-4 flex flex-col h-screen bg-white overflow-y-auto z-20",
+          "transition-all duration-300 ease-in-out",
+          isMobile && !isOpen ? "fixed -right-full" : isMobile ? "fixed right-0" : ""
+        )}
+      >
+        <div className="mb-4">
+          <h2 className="font-medium mb-4">
+            {user ? (currentWorkspace?.name || 'Select a workspace') : 'Local Tasks'}
+          </h2>
+          <div className="flex gap-2">
+            <Input
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Add a task..."
+              className="flex-1"
+            />
+            <button
+              onClick={handleCreateTask}
+              className="p-2 hover:bg-gray-100 rounded"
+              disabled={!newTaskTitle.trim()}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+        <TaskList />
       </div>
-      <TaskList />
-    </div>
+
+      {/* Overlay for mobile */}
+      {isMobile && isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/30 z-10 md:hidden"
+          onClick={() => setIsOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+    </>
   )
 }
   

@@ -14,8 +14,8 @@ export function DashboardStats() {
 
   return (
     <section aria-labelledby="dashboard-stats-heading">
-      <h2 id="dashboard-stats-heading" className="text-xl font-semibold mb-4">Dashboard Overview</h2>
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <h2 id="dashboard-stats-heading" className="text-xl font-semibold mb-3 sm:mb-4">Dashboard Overview</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <StatsCard 
           title="Active Projects" 
           count={workspaceCount} 
