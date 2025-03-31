@@ -29,24 +29,28 @@ export function TimerDisplay() {
       <Card className="w-full min-w-0">
         <CardContent className="pt-6 overflow-hidden">
           {/* Timer Mode Selection */}
-          <nav aria-label="Timer modes" className="flex flex-wrap justify-center gap-2 mb-8 px-2">
+          <nav aria-label="Timer modes" className="flex flex-wrap justify-center gap-1 sm:gap-2 mb-6 sm:mb-8 px-1 sm:px-2">
             {modes.map((modeOption) => (
               <Button
                 key={modeOption.id}
                 variant={mode === modeOption.id ? "default" : "ghost"}
-                className="gap-2 whitespace-nowrap"
+                className="gap-1 sm:gap-2 whitespace-nowrap text-xs sm:text-sm px-2 sm:px-3"
                 onClick={() => switchMode(modeOption.id)}
                 aria-pressed={mode === modeOption.id}
                 aria-label={`${modeOption.label} mode`}
               >
-                <modeOption.icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                {modeOption.label}
+                <modeOption.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" aria-hidden="true" />
+                <span className="hidden xs:inline">{modeOption.label}</span>
+                <span className="xs:hidden">
+                  {modeOption.id === 'focus' ? 'Focus' : 
+                   modeOption.id === 'shortBreak' ? 'Short' : 'Long'}
+                </span>
               </Button>
             ))}
           </nav>
 
           {/* Timer Display */}
-          <div className="flex justify-center mb-8" aria-live="polite" role="timer">
+          <div className="flex justify-center mb-6 sm:mb-8" aria-live="polite" role="timer">
             <TimerCountdown formattedTime={formattedTime} />
           </div>
 
@@ -57,16 +61,18 @@ export function TimerDisplay() {
               size="icon"
               onClick={toggleTimer}
               aria-label={isRunning ? "Stop timer" : "Start timer"}
+              className="h-10 w-10 sm:h-12 sm:w-12"
             >
-              {isRunning ? <StopIcon className="h-4 w-4" aria-hidden="true" /> : <PlayIcon className="h-4 w-4" aria-hidden="true" />}
+              {isRunning ? <StopIcon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" /> : <PlayIcon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />}
             </Button>
             <Button 
               variant="outline" 
               size="icon"
               onClick={() => resetTimer()}
               aria-label="Reset timer"
+              className="h-10 w-10 sm:h-12 sm:w-12"
             >
-              <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+              <RefreshCcw className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
             </Button>
             <TimerSettingsDialog 
               settings={settings}

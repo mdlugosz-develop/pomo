@@ -69,9 +69,9 @@ export default function RootLayout({
               <GlobalLoader>
                 <SpeedInsights />
                 <Analytics />
-                <div className="flex flex-1 bg-white">
+                <div className="flex flex-col md:flex-row flex-1 bg-white">
                   <Sidebar />
-                  <main className="flex-1 p-6 overflow-y-auto">
+                  <main className="flex-1 p-4 md:p-6 overflow-y-auto">
                       {children}
                   </main>
                   <TaskPanel />
@@ -81,10 +81,10 @@ export default function RootLayout({
           </TimerProvider>
         </AuthProvider>
         
-        <footer className="text-center p-4 text-sm text-gray-500 mt-auto" role="contentinfo">
-          <div className="flex justify-center gap-4">
+        <footer className="text-center p-3 md:p-4 text-xs md:text-sm text-gray-500 mt-auto" role="contentinfo">
+          <div className="flex justify-center gap-2 md:gap-4">
             <nav aria-label="Legal pages">
-              <ul className="flex gap-4">
+              <ul className="flex gap-2 md:gap-4">
                 <li>
                   <Link href="/privacy" className="hover:text-gray-700">
                     Privacy Policy
@@ -103,7 +103,7 @@ export default function RootLayout({
               </ul>
             </nav>
           </div>
-          <p className="mt-2">
+          <p className="mt-1 md:mt-2">
             <small>&copy; {new Date().getFullYear()} PomoTime. All rights reserved.</small>
           </p>
         </footer>
