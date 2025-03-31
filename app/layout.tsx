@@ -62,16 +62,16 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body>
+      <body className="flex flex-col min-h-screen">
         <AuthProvider>
           <TimerProvider>
             <WorkspaceProvider>
               <GlobalLoader>
                 <SpeedInsights />
                 <Analytics />
-                <div className="flex h-screen bg-white">
+                <div className="flex flex-1 bg-white">
                   <Sidebar />
-                  <main className="flex-1 p-6">
+                  <main className="flex-1 p-6 overflow-y-auto">
                       {children}
                   </main>
                   <TaskPanel />
@@ -81,7 +81,7 @@ export default function RootLayout({
           </TimerProvider>
         </AuthProvider>
         
-        <footer className="text-center p-4 text-sm text-gray-500" role="contentinfo">
+        <footer className="text-center p-4 text-sm text-gray-500 mt-auto" role="contentinfo">
           <div className="flex justify-center gap-4">
             <nav aria-label="Legal pages">
               <ul className="flex gap-4">
