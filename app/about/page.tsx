@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card"
 import Script from 'next/script'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function AboutPage() {
