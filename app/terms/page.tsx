@@ -13,15 +13,13 @@ export default function TermsOfUse() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">2. User Accounts</h2>
+          <h2 className="text-2xl font-semibold mb-4">2. Your Data</h2>
           <p className="mb-4">
-            You are responsible for:
+            PomoTime does not use accounts. Your workspaces, tasks and settings are
+            stored only in your browser&apos;s local storage. You are responsible
+            for that data: it is not backed up, and it is lost if you clear your
+            browser&apos;s site data. We cannot recover it.
           </p>
-          <ul className="list-disc pl-6 mb-4">
-            <li>Maintaining the confidentiality of your account</li>
-            <li>All activities that occur under your account</li>
-            <li>Notifying us immediately of any unauthorized use</li>
-          </ul>
         </section>
 
         <section className="mb-8">
@@ -33,23 +31,22 @@ export default function TermsOfUse() {
             <li>Use the service for any illegal purpose</li>
             <li>Attempt to gain unauthorized access to any portion of the service</li>
             <li>Interfere with or disrupt the service</li>
-            <li>Share your account credentials with others</li>
           </ul>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">4. Termination</h2>
           <p className="mb-4">
-            We reserve the right to terminate or suspend your account at any time 
-            for any reason without notice.
+            We reserve the right to suspend or discontinue the service, or restrict
+            access to it, at any time for any reason without notice.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">5. Changes to Terms</h2>
           <p className="mb-4">
-            We reserve the right to modify these terms at any time. We will notify 
-            users of any material changes via email or through the application.
+            We reserve the right to modify these terms at any time. We will notify
+            users of any material changes through the application.
           </p>
         </section>
 
