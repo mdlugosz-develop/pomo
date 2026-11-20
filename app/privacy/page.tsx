@@ -7,14 +7,19 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Information We Collect</h2>
           <p className="mb-4">
-            We collect information you provide directly to us when you:
+            PomoTime does not require an account and does not collect your name,
+            email address or any other personal details. The workspaces, tasks and
+            timer settings you create are never sent to our servers.
           </p>
-          <ul className="list-disc pl-6 mb-4">
-            <li>Create an account</li>
-            <li>Create workspaces and tasks</li>
-            <li>Use our timer features</li>
-            <li>Contact us for support</li>
-          </ul>
+          <p className="mb-4">
+            We use Vercel Analytics and Vercel Speed Insights to collect anonymous,
+            aggregated usage and performance data (such as page views and load
+            times) so we can improve the app.
+          </p>
+          <p className="mb-4">
+            If you contact us for support, we receive the information you choose to
+            include in your message.
+          </p>
         </section>
 
         <section className="mb-8">
@@ -24,8 +29,6 @@ export default function PrivacyPolicy() {
           </p>
           <ul className="list-disc pl-6 mb-4">
             <li>Provide, maintain, and improve our services</li>
-            <li>Process your transactions</li>
-            <li>Send you technical notices and support messages</li>
             <li>Respond to your comments and questions</li>
           </ul>
         </section>
@@ -33,8 +36,13 @@ export default function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Data Storage</h2>
           <p className="mb-4">
-            We use Supabase to store your data securely. Your data is encrypted 
-            and protected according to industry standards.
+            Your workspaces, tasks and timer settings are stored only in your
+            browser&apos;s local storage on your device. They are not synced between
+            browsers or devices, and we cannot access or recover them.
+          </p>
+          <p className="mb-4">
+            Clearing your browser&apos;s site data, or using a private/incognito
+            window, will permanently remove this data.
           </p>
         </section>
 

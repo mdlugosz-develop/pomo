@@ -4,7 +4,6 @@ import { useState, KeyboardEvent, useEffect } from 'react'
 import { useWorkspace } from '@/contexts/workspace-context'
 import { Plus, ChevronDown, ChevronRight, ClipboardList, X } from 'lucide-react'
 import { Input } from './ui/input'
-import { useAuth } from '@/contexts/auth-context'
 import { TaskItem } from './task-item'
 import { cn } from '@/lib/utils'
 import {
@@ -22,7 +21,6 @@ import {
 } from '@dnd-kit/sortable'
 
 export function TaskPanel() {
-  const { user } = useAuth()
   const { currentWorkspace, tasks, createTask, updateTask, deleteTask, updateTaskOrder } = useWorkspace()
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [showCompleted, setShowCompleted] = useState(false)
@@ -60,10 +58,7 @@ export function TaskPanel() {
     })
   )
 
-  // Filter tasks based on authentication status
-  const filteredTasks = user 
-    ? tasks.filter(task => task.workspace_id === currentWorkspace?.id)
-    : tasks.filter(task => !task.workspace_id) // Show local tasks when not authenticated
+  const filteredTasks = tasks.filter(task => task.workspace_id === currentWorkspace?.id)
 
   // Separate active and completed tasks
   const activeTasks = filteredTasks
@@ -97,15 +92,7 @@ export function TaskPanel() {
         order: index * 1000
       }))
 
-      // Update local state immediately
-      updateTaskOrder(updates, true)
-
-      // Then sync with database
-      try {
-        await updateTaskOrder(updates, false)
-      } catch (error) {
-        console.error('Failed to update task order:', error)
-      }
+      await updateTaskOrder(updates)
     }
   }
 
@@ -224,7 +211,7 @@ export function TaskPanel() {
       >
         <div className="mb-4">
           <h2 className="font-medium mb-4">
-            {user ? (currentWorkspace?.name || 'Select a workspace') : 'Local Tasks'}
+            {currentWorkspace?.name || 'Select a workspace'}
           </h2>
           <div className="flex gap-2">
             <Input

@@ -3,17 +3,13 @@
 import { Home, ListTodo, Info, Menu, X } from 'lucide-react'
 import Link from "next/link"
 import Image from "next/image"
-import { AuthButton } from "@/components/auth-button"
 import { Workspaces } from '@/components/workspaces'
-import { UserProfile } from './user-profile'
-import { useAuth } from '@/contexts/auth-context'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { MiniTimer } from './mini-timer'
 import { useState, useEffect } from 'react'
 
 export function Sidebar() {
-  const { user } = useAuth()
   const pathname = usePathname()
   const showMiniTimer = pathname !== '/'
   const [isOpen, setIsOpen] = useState(false)
@@ -123,11 +119,6 @@ export function Sidebar() {
             <MiniTimer />
           </div>
         )}
-
-        <div className="mt-auto pt-4">
-          {!user && <AuthButton />}
-          {user && <UserProfile />}
-        </div>
       </aside>
       
       {/* Overlay for mobile */}
