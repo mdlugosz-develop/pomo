@@ -46,5 +46,5 @@ export interface WorkspaceContextType {
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
   deleteWorkspace: (workspaceId: string) => Promise<void>
-  updateTaskOrder: (updates: TaskOrderUpdate[], isOptimistic?: boolean) => Promise<void>
+  updateTaskOrder: (updates: TaskOrderUpdate[]) => Promise<void>
 }
