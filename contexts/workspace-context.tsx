@@ -3,41 +3,13 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '@/contexts/auth-context'
-import { Task, Workspace } from '../lib/types'
+import { Task, Workspace, WorkspaceContextType, CreateTaskInput, TaskOrderUpdate } from '../lib/types'
 import { WorkspaceLimitModal } from '@/components/workspace-limit-modal'
 
 // Add a key for localStorage
 const LOCAL_TASKS_KEY = 'local_tasks'
 
-interface WorkspaceContextType {
-  workspaces: Workspace[]
-  currentWorkspace: Workspace | null
-  tasks: Task[]
-  loading: boolean
-  error: string | null
-  setCurrentWorkspace: (workspace: Workspace) => void
-  createWorkspace: (name: string, description?: string) => Promise<void>
-  createTask: (input: CreateTaskInput) => Promise<void>
-  updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>
-  deleteTask: (taskId: string) => Promise<void>
-  deleteWorkspace: (workspaceId: string) => Promise<void>
-  updateTaskOrder: (updates: TaskOrderUpdate[], isOptimistic?: boolean) => Promise<void>
-}
-
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined)
-
-interface CreateTaskInput {
-  title: string
-  description?: string
-  status?: 'todo' | 'in_progress' | 'completed'
-  priority?: 'low' | 'medium' | 'high'
-  due_date?: string
-}
-
-interface TaskOrderUpdate {
-  id: string
-  order: number
-}
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
