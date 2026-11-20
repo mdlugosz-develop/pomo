@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from '@/contexts/auth-context'
 import { WorkspaceProvider } from '@/contexts/workspace-context'
 import { Sidebar } from '@/components/sidebar'
 import { TaskPanel } from '@/components/task-panel'
@@ -63,7 +62,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className="flex flex-col min-h-screen">
-        <AuthProvider>
           <TimerProvider>
             <WorkspaceProvider>
               <GlobalLoader>
@@ -79,7 +77,6 @@ export default function RootLayout({
               </GlobalLoader>
             </WorkspaceProvider>
           </TimerProvider>
-        </AuthProvider>
         
         <footer className="text-center p-3 md:p-4 text-xs md:text-sm text-gray-500 mt-auto" role="contentinfo">
           <div className="flex justify-center gap-2 md:gap-4">

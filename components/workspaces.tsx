@@ -1,14 +1,12 @@
 'use client'
 
 import { useWorkspace } from '@/contexts/workspace-context'
-import { useAuth } from '@/contexts/auth-context'
 import { cn } from '@/lib/utils'
 import { CreateWorkspaceDialog } from './create-workspace-dialog'
 import { Trash2 } from 'lucide-react'
 
 export function Workspaces() {
   const { workspaces, currentWorkspace, setCurrentWorkspace, deleteWorkspace } = useWorkspace()
-  const { user } = useAuth()
 
   const handleDelete = async (e: React.MouseEvent, workspaceId: string) => {
     e.stopPropagation()
@@ -25,14 +23,10 @@ export function Workspaces() {
     <div className="mt-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-medium">Workspaces</h2>
-        {user && <CreateWorkspaceDialog />}
+        <CreateWorkspaceDialog />
       </div>
       <div className="space-y-1">
-        {!user ? (
-          <p className="text-sm text-gray-500 text-center py-2">
-            Sign in to create workspaces
-          </p>
-        ) : workspaces.length === 0 ? (
+        {workspaces.length === 0 ? (
           <p className="text-sm text-gray-500 text-center py-2">
             No workspaces yet
           </p>

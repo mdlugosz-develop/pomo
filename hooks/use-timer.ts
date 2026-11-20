@@ -1,6 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useAuth } from '@/contexts/auth-context'
-import { supabase } from '@/lib/supabase'
 
 export type TimerMode = "focus" | "shortBreak" | "longBreak"
 
@@ -18,13 +16,41 @@ const DEFAULT_SETTINGS: TimerSettings = {
   longBreakInterval: 4, // Number of focus sessions before long break
 }
 
+const TIMER_SETTINGS_KEY = 'pomo_timer_settings'
+
+function loadTimerSettings(): TimerSettings | null {
+  try {
+    const raw = localStorage.getItem(TIMER_SETTINGS_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    const valid = (n: unknown) => typeof n === 'number' && Number.isFinite(n) && n > 0
+    if (!valid(parsed?.focus) || !valid(parsed?.shortBreak) || !valid(parsed?.longBreak)) return null
+    return {
+      ...DEFAULT_SETTINGS,
+      focus: parsed.focus,
+      shortBreak: parsed.shortBreak,
+      longBreak: parsed.longBreak,
+      longBreakInterval: valid(parsed.longBreakInterval) ? parsed.longBreakInterval : DEFAULT_SETTINGS.longBreakInterval,
+    }
+  } catch {
+    return null
+  }
+}
+
+function saveTimerSettings(settings: TimerSettings): void {
+  try {
+    localStorage.setItem(TIMER_SETTINGS_KEY, JSON.stringify(settings))
+  } catch {
+    // Storage unavailable; settings still apply for this session
+  }
+}
+
 export function useTimer() {
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS)
   const [mode, setMode] = useState<TimerMode>("focus")
   const [timeLeft, setTimeLeft] = useState(settings.focus)
   const [isRunning, setIsRunning] = useState(false)
   const [sessionCount, setSessionCount] = useState(0)
-  const { user } = useAuth()
   const bellRef = useRef<HTMLAudioElement | null>(null)
   const clickRef = useRef<HTMLAudioElement | null>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -76,38 +102,14 @@ export function useTimer() {
     }
   }, [isRunning])
 
-  const fetchTimerSettings = useCallback(async () => {
-    if (user) {
-      const { data, error } = await supabase
-        .from('timer_settings')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching timer settings:', error);
-        return;
-      }
-
-      if (data) {
-        const newSettings = {
-          focus: data.focus_time * 60,
-          shortBreak: data.short_break * 60,
-          longBreak: data.long_break * 60,
-          longBreakInterval: 4
-        };
-        setSettings(newSettings);
-        // Only set initial time if we're not in a paused state
-        if (!pausedTimeRef.current) {
-          setTimeLeft(newSettings[mode]);
-        }
-      }
-    }
-  }, [user, mode]);
-
+  // Load saved timer settings once on mount (settings are stored in seconds)
   useEffect(() => {
-    fetchTimerSettings();
-  }, [fetchTimerSettings]);
+    const saved = loadTimerSettings()
+    if (saved) {
+      setSettings(saved)
+      setTimeLeft(saved.focus)
+    }
+  }, [])
 
   const resetTimer = useCallback((newMode?: TimerMode) => {
     const timerMode = newMode || mode
@@ -153,29 +155,14 @@ export function useTimer() {
     })
   }, [timeLeft, mode, settings])
 
-  const updateSettings = useCallback(async (newSettings: TimerSettings) => {
-    if (user) {
-      const { error } = await supabase
-        .from('timer_settings')
-        .update({
-          focus_time: newSettings.focus / 60,
-          short_break: newSettings.shortBreak / 60,
-          long_break: newSettings.longBreak / 60
-        })
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error updating timer settings:', error);
-        return;
-      }
-    }
-    
+  const updateSettings = useCallback((newSettings: TimerSettings) => {
+    saveTimerSettings(newSettings)
     setSettings(newSettings);
     setIsRunning(false);
     setTimeLeft(newSettings[mode]);
     startTimeRef.current = null
     pausedTimeRef.current = null
-  }, [mode, user]);
+  }, [mode]);
 
   const nextSession = useCallback(() => {
     if (mode === "focus") {
@@ -239,7 +226,6 @@ export function useTimer() {
       toggleTimer,
       resetTimer,
       updateSettings,
-      refreshSettings: fetchTimerSettings,
     }
   }
 } 
