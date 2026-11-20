@@ -123,6 +123,9 @@ export function useTimer() {
     bellRef.current?.play().catch(error => console.error('Error playing sound:', error))
     resetTimer(newMode)
     if (autoStart) {
+      // The countdown loop only ticks while startTimeRef is set, and
+      // resetTimer clears it, so start the clock for the new session here.
+      startTimeRef.current = performance.now()
       setIsRunning(true)
     } else {
       setIsRunning(false)
