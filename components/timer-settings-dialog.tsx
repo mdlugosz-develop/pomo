@@ -35,8 +35,13 @@ export function TimerSettingsDialog({ settings, onSave }: TimerSettingsDialogPro
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Settings className="h-4 w-4" />
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="Timer settings"
+          className="h-10 w-10 sm:h-12 sm:w-12"
+        >
+          <Settings className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
         </Button>
       </DialogTrigger>
       <DialogContent>
