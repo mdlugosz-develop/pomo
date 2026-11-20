@@ -8,9 +8,9 @@ import { Trash2 } from 'lucide-react'
 export function Workspaces() {
   const { workspaces, currentWorkspace, setCurrentWorkspace, deleteWorkspace } = useWorkspace()
 
-  const handleDelete = async (e: React.MouseEvent, workspaceId: string) => {
+  const handleDelete = async (e: React.MouseEvent, workspaceId: string, name: string) => {
     e.stopPropagation()
-    if (confirm('Are you sure you want to delete this workspace?')) {
+    if (confirm(`Delete "${name}" and all of its tasks? This cannot be undone.`)) {
       try {
         await deleteWorkspace(workspaceId)
       } catch (error) {
@@ -46,7 +46,8 @@ export function Workspaces() {
                 {workspace.name}
               </button>
               <button
-                onClick={(e) => handleDelete(e, workspace.id)}
+                onClick={(e) => handleDelete(e, workspace.id, workspace.name)}
+                aria-label={`Delete workspace ${workspace.name}`}
                 className="opacity-0 group-hover:opacity-100 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-opacity"
               >
                 <Trash2 className="h-4 w-4" />
